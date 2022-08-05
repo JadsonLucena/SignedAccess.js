@@ -348,6 +348,15 @@ class SignedAccess {
 
         cookie.delete('signature');
 
+
+        return (
+            signature == this.#toSign(cookie.toString(), key, algorithm)
+            && Date.now() < cookie.get('expires')
+            && (cookie.has('ip') ? cookie.get('ip') == ip.trim() : true)
+            && (cookie.has('method') ? cookie.getAll('method').includes(method.trim().toUpperCase()) : true)
+            && url.href.startsWith(this.#decodePrefix(cookie.get('prefix')))
+        );
+
     }
 }
 
