@@ -139,6 +139,14 @@ class SignedAccess {
 
         }
 
+
+        url.searchParams.delete('expires');
+        url.searchParams.delete('ip');
+        url.searchParams.delete('method');
+        url.searchParams.delete('nonce');
+        url.searchParams.delete('prefix');
+        url.searchParams.delete('signature');
+
     }
 
 }
