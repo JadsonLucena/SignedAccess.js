@@ -316,6 +316,21 @@ class SignedAccess {
         cookie = new URLSearchParams(cookie);
         url = new URL(url);
 
+
+        if (!cookie.has('prefix') || !cookie.has('expires') || !cookie.has('signature')) {
+
+            throw new TypeError('Invalid cookie');
+
+        } else if (typeof ip != 'string') {
+
+            throw new TypeError('Invalid ip');
+
+        } else if (typeof method != 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
+
+            throw new TypeError('Invalid method');
+
+        }
+
     }
 }
 
