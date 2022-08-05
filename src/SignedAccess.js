@@ -147,6 +147,22 @@ class SignedAccess {
         url.searchParams.delete('prefix');
         url.searchParams.delete('signature');
 
+
+        let searchParams = new URLSearchParams();
+
+        searchParams.set('expires', this.#timestamp(ttl));
+        if (ip) searchParams.set('ip', ip.trim());
+        if (methods.length) methods.forEach(method => searchParams.append('method', method.trim().toUpperCase()));
+        if (nonce >= 0) searchParams.set('nonce', nonce);
+        if (pathname) searchParams.set('prefix', this.#encodePrefix(new URL(pathname, url.origin).href));
+
+
+        for (var pair of searchParams.entries()) {
+
+            url.searchParams.append(pair[0], pair[1]);
+
+        }
+
     }
 
 }
