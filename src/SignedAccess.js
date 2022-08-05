@@ -264,6 +264,29 @@ class SignedAccess {
         methods = [].concat(methods);
         methods = [...new Set(methods)];
 
+
+        if (typeof prefix != 'string') {
+
+            throw new TypeError('Invalid prefix');
+
+        } else if (isNaN(ttl) || typeof ttl != 'number' || ttl < 1) {
+
+            throw new TypeError('Invalid ttl');
+
+        } else if (typeof ip != 'string') {
+
+            throw new TypeError('Invalid ip');
+
+        } else if (!methods.every(method => typeof method == 'string' && this.#HTTPMethods.includes(method.trim().toUpperCase()))) {
+
+            throw new TypeError('Invalid methods');
+
+        } else if (isNaN(nonce) || typeof nonce != 'number' || (nonce != -1 && nonce < 0)) {
+
+            throw new TypeError('Invalid nonce');
+
+        }
+
     }
 
 }
