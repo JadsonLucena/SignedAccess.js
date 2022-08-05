@@ -20,6 +20,11 @@ class SignedAccess {
 
     }
 
+
+    get algorithm() { return this.#algorithm; }
+    get ttl() { return this.#ttl; }
+    get key() { return this.#key; }
+
 }
 
 module.exports = SignedAccess;
