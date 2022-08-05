@@ -181,6 +181,8 @@ class SignedAccess {
         } = {}
     ) {
 
+        url = new URL(url);
+
     }
 
 }
