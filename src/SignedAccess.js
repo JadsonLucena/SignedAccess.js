@@ -194,6 +194,17 @@ class SignedAccess {
 
         }
 
+
+        if (url.searchParams.has('ip') && !ip.trim()) {
+
+            throw new Error('ip required');
+
+        } else if (url.searchParams.has('method') && !method.trim().toUpperCase()) {
+
+            throw new Error('method required');
+
+        }
+
     }
 
 }
