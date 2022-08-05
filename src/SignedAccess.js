@@ -81,6 +81,12 @@ class SignedAccess {
 
     }
 
+    #timestamp(ttl) {
+
+        return Date.now() + parseInt(ttl) * 1000;
+
+    }
+
 }
 
 module.exports = SignedAccess;
