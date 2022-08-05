@@ -342,6 +342,12 @@ class SignedAccess {
 
         }
 
+
+        let signature = cookie.get('signature');
+
+
+        cookie.delete('signature');
+
     }
 }
 
