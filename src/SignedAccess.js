@@ -287,6 +287,19 @@ class SignedAccess {
 
         }
 
+
+        let cookie = new URLSearchParams();
+
+        cookie.set('expires', this.#timestamp(ttl));
+        if (ip) cookie.set('ip', ip.trim());
+        if (methods.length) methods.forEach(method => cookie.append('method', method.trim().toUpperCase()));
+        if (nonce >= 0) cookie.set('nonce', nonce);
+        cookie.set('prefix', this.#encodePrefix(prefix));
+        
+        cookie.set('signature', this.#toSign(cookie.toString(), key, algorithm));
+        
+        return cookie.toString();
+
     }
 
 }
