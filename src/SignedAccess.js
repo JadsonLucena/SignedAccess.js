@@ -106,9 +106,15 @@ class SignedAccess {
             key = this.#key,
             methods = [],
             nonce = -1, // Natural numbers
-            path = '',
+            pathname = '',
         } = {}
     ) {
+
+        url = new URL(url);
+
+
+        methods = [].concat(methods);
+        methods = [...new Set(methods)];
 
     }
 
