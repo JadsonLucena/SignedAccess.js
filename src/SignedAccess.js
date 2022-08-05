@@ -331,6 +331,17 @@ class SignedAccess {
 
         }
 
+
+        if (cookie.has('ip') && !ip.trim()) {
+
+            throw new Error('ip required');
+
+        } else if (cookie.has('method') && !method.trim().toUpperCase()) {
+
+            throw new Error('method required');
+
+        }
+
     }
 }
 
