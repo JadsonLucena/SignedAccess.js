@@ -205,6 +205,12 @@ class SignedAccess {
 
         }
 
+
+        let signature = url.searchParams.get('signature');
+
+
+        url.searchParams.delete('signature');
+
     }
 
 }
