@@ -171,6 +171,18 @@ class SignedAccess {
 
     }
 
+    verifyURL(
+        url,
+        {
+            algorithm = this.#algorithm,
+            ip = '',
+            key = this.#key,
+            method = ''
+        } = {}
+    ) {
+
+    }
+
 }
 
 module.exports = SignedAccess;
