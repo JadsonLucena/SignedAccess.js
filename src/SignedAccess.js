@@ -302,6 +302,18 @@ class SignedAccess {
 
     }
 
+    verifyCookie(
+        url,
+        cookie,
+        {
+            algorithm = this.#algorithm,
+            ip = '',
+            key = this.#key,
+            method = ''
+        } = {}
+    ) {
+
+    }
 }
 
 module.exports = SignedAccess;
