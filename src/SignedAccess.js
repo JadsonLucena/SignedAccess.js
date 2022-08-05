@@ -236,6 +236,15 @@ class SignedAccess {
                 && url.href.startsWith(this.#decodePrefix(url.searchParams.get('prefix')))
             );
 
+        } else {
+
+            return (
+                signature == this.#toSign(url.href, key, algorithm)
+                && Date.now() < url.searchParams.get('expires')
+                && (url.searchParams.has('ip') ? url.searchParams.get('ip') == ip.trim() : true)
+                && (url.searchParams.has('method') ? url.searchParams.getAll('method').includes(method.trim().toUpperCase()) : true)
+            );
+
         }
 
     }
