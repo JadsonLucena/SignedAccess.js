@@ -163,6 +163,12 @@ class SignedAccess {
 
         }
 
+
+        url.searchParams.set('signature', this.#toSign(searchParams.has('prefix') ? searchParams.toString() : url.href, key, algorithm));
+
+
+        return url.href;
+
     }
 
 }
