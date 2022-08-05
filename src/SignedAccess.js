@@ -261,6 +261,9 @@ class SignedAccess {
         } = {}
     ) {
 
+        methods = [].concat(methods);
+        methods = [...new Set(methods)];
+
     }
 
 }
