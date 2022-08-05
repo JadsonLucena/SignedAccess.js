@@ -97,6 +97,21 @@ class SignedAccess {
 
     }
 
+    signURL(
+        url,
+        {
+            algorithm = this.#algorithm,
+            ttl = this.#ttl,
+            ip = '',
+            key = this.#key,
+            methods = [],
+            nonce = -1, // Natural numbers
+            path = '',
+        } = {}
+    ) {
+
+    }
+
 }
 
 module.exports = SignedAccess;
