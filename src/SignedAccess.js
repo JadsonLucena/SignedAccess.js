@@ -87,6 +87,16 @@ class SignedAccess {
 
     }
 
+    #toSign(
+        input,
+        key,
+        algorithm
+    ) {
+
+        return crypto.createHmac(algorithm, key).update(input).digest('base64url');
+
+    }
+
 }
 
 module.exports = SignedAccess;
