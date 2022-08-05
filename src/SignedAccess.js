@@ -73,6 +73,14 @@ class SignedAccess {
 
     }
 
+    #decodePrefix(prefix) {
+
+        // https://www.w3schools.com/tags/ref_urlencode.asp
+        // https://datatracker.ietf.org/doc/html/rfc4648#section-5
+        return Buffer.from(prefix, 'base64url').toString('ascii');
+
+    }
+
 }
 
 module.exports = SignedAccess;
