@@ -313,6 +313,9 @@ class SignedAccess {
         } = {}
     ) {
 
+        cookie = new URLSearchParams(cookie);
+        url = new URL(url);
+
     }
 }
 
