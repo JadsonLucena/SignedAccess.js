@@ -63,6 +63,16 @@ class SignedAccess {
 
     }
 
+
+    #encodePrefix(prefix) {
+
+        prefix = new URL(prefix);
+
+        // The prefix shouldn't include query parameters or fragments such as ? or #
+        return Buffer.from(prefix.origin + prefix.pathname, 'ascii').toString('base64url');
+
+    }
+
 }
 
 module.exports = SignedAccess;
