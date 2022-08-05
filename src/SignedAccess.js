@@ -249,6 +249,20 @@ class SignedAccess {
 
     }
 
+    signCookie(
+        prefix, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
+        {
+            algorithm = this.#algorithm,
+            ttl = this.#ttl,
+            ip = '',
+            key = this.#key,
+            methods = [],
+            nonce = -1 // Natural numbers
+        } = {}
+    ) {
+
+    }
+
 }
 
 module.exports = SignedAccess;
