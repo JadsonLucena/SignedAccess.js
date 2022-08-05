@@ -183,6 +183,17 @@ class SignedAccess {
 
         url = new URL(url);
 
+
+        if (typeof ip != 'string') {
+
+            throw new TypeError('Invalid ip');
+
+        } else if (typeof method != 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
+
+            throw new TypeError('Invalid method');
+
+        }
+
     }
 
 }
