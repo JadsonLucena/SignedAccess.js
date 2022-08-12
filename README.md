@@ -38,3 +38,12 @@ ttl(): number
 
 key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
 ```
+
+```typescript
+// Setters
+algorithm(arg?: string = 'sha512'): void
+
+ttl(arg?: number = 86400): void
+
+key(arg?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey) = '{The MAC address of the network interface}'): void
+```
