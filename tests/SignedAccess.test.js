@@ -279,4 +279,21 @@ describe('signCookie', () => {
 
 	});
 
+	test('default values', () => {
+
+		let cookieSigned = signedAccess.signCookie(prefix);
+
+		let searchParams = new URLSearchParams(cookieSigned);
+		let querys = Array.from(searchParams.keys());
+
+		expect(querys.length).toBe(3);
+		expect(querys).toContain('expires');
+		expect(querys).toContain('prefix');
+		expect(querys).toContain('signature');
+		expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now());
+		expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/);
+		expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/);
+
+	});
+
 });
