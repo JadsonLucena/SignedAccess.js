@@ -164,4 +164,16 @@ describe('verifyURL', () => {
 
 	});
 
+	test('default values', () => {
+
+		let urlSigned = signedAccess.URLSign(url);
+
+		expect(signedAccess.verifyURL(urlSigned)).toBeTruthy();
+		expect(signedAccess.verifyURL(urlSigned, { algorithm: 'sha1' })).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { ip: '127.0.0.1' })).toBeTruthy(); // should be ignored
+		expect(signedAccess.verifyURL(urlSigned, { key: 'anything' })).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { method: 'POST' })).toBeTruthy(); // should be ignored
+
+	});
+
 });
