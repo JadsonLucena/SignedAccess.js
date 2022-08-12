@@ -21,4 +21,14 @@ describe('constructor', () => {
 
 	});
 
+	test('default values', () => {
+
+		const signedAccess = new SignedAccess();
+
+		expect(signedAccess.algorithm).toBe('sha512');
+		expect(signedAccess.ttl).toBe(86400);
+		expect(signedAccess.key).toBe(require('os').networkInterfaces()['eth0'][0].mac);
+
+	});
+
 });
