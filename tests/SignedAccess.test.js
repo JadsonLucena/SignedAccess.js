@@ -350,4 +350,21 @@ describe('verifyCookie', () => {
 
 	});
 
+	test('default values', () => {
+
+		let cookieSigned = signedAccess.CookieSign(prefix);
+
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned)).toBeTruthy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { algorithm: 'sha1' })).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { ip: '127.0.0.1' })).toBeTruthy(); // should be ignored
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { key: 'anything' })).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { method: 'POST' })).toBeTruthy(); // should be ignored
+
+
+		cookieSigned = signedAccess.CookieSign(mockURL)
+
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned)).toBeTruthy();
+
+	});
+
 });
