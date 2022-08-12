@@ -176,4 +176,88 @@ describe('verifyURL', () => {
 
 	});
 
+	test('custom values', () => {
+
+		let urlSigned = signedAccess.URLSign(url, { algorithm: 'sha1' });
+
+		expect(signedAccess.verifyURL(urlSigned)).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { algorithm: 'sha1' })).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign(url, { ip: '127.0.0.1' });
+
+		expect(() => signedAccess.verifyURL(urlSigned)).toThrow('ip required');
+		expect(signedAccess.verifyURL(urlSigned, { ip: '142.251.129.78' })).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { ip: '127.0.0.1' })).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign(url, { key: 'xyz' });
+
+		expect(signedAccess.verifyURL(urlSigned)).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { key: 'xyz' })).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign(url, { methods: 'POST' });
+
+		expect(() => signedAccess.verifyURL(urlSigned)).toThrow('method required');
+		expect(signedAccess.verifyURL(urlSigned, { method: 'PATCH' })).toBeFalsy();
+		expect(signedAccess.verifyURL(urlSigned, { method: 'POST' })).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign('https://example.com/data/file1', {
+			pathname: '/data'
+		});
+
+		let mockURLSigned = `https://example.com/database?${new URL(urlSigned).searchParams.toString()}`;
+
+		expect(signedAccess.verifyURL(mockURLSigned)).toBeTruthy();
+
+		mockURLSigned = `https://example.com/data/file2?${new URL(urlSigned).searchParams.toString()}`;
+
+		expect(signedAccess.verifyURL(mockURLSigned)).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign('https://example.com/data/file1', {
+			pathname: '/data/'
+		});
+
+		mockURLSigned = `https://example.com/database?${new URL(urlSigned).searchParams.toString()}`;
+
+		expect(signedAccess.verifyURL(mockURLSigned)).toBeFalsy();
+
+		mockURLSigned = `https://example.com/data/file2?${new URL(urlSigned).searchParams.toString()}`;
+
+		expect(signedAccess.verifyURL(mockURLSigned)).toBeTruthy();
+
+
+		urlSigned = signedAccess.URLSign(url, {
+			ip: '127.0.0.1',
+			methods: ['POST', 'PUT'],
+			nonce: 999,
+			pathname: '/JadsonLucena/'
+		});
+
+		mockURLSigned = `https://github.com/JadsonLucena/WebSocket.js?${new URL(urlSigned).searchParams.toString()}`;
+
+		expect(() => signedAccess.verifyURL(mockURLSigned)).toThrow('ip required');
+		expect(() => signedAccess.verifyURL(mockURLSigned, { ip: '142.251.129.78' })).toThrow('method required');
+		expect(signedAccess.verifyURL(mockURLSigned, {
+			ip: '142.251.129.78',
+			method: 'DELETE'
+		})).toBeFalsy();
+		expect(signedAccess.verifyURL(mockURLSigned, {
+			ip: '127.0.0.1',
+			method: 'GET'
+		})).toBeFalsy();
+		expect(signedAccess.verifyURL(mockURLSigned, {
+			ip: '142.251.129.78',
+			method: 'POST'
+		})).toBeFalsy();
+		expect(signedAccess.verifyURL(mockURLSigned, {
+			ip: '127.0.0.1',
+			method: 'PUT'
+		})).toBeTruthy();
+
+	});
+
 });
