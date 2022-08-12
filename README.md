@@ -47,3 +47,77 @@ ttl(arg?: number = 86400): void
 
 key(arg?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey) = '{The MAC address of the network interface}'): void
 ```
+
+```typescript
+// Methods
+signCookie(
+    prefix: string, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
+    {
+        algorithm = 'sha512',
+        ttl = 86400,
+        ip = '',
+        key = '{The MAC address of the network interface}'
+        methods = [],
+        nonce = -1 // Natural numbers
+    }: {
+        algorithm?: string,
+        ttl?: number,
+        ip?: string,
+        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
+        methods?: string | string[],
+        nonce?: number
+    } = {}
+): string // Cookie signed
+
+verifyCookie(
+    url: string,
+    cookie: string,
+    {
+        algorithm = 'sha512',
+        ip = '', // will be required if it has been added to the signature
+        key = '{The MAC address of the network interface}'
+        method = '', // will be required if it has been added to the signature
+    }: {
+        algorithm?: string,
+        ip?: string,
+        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
+        method?: string
+    } = {}
+): boolean
+
+signURL(
+    url: string,
+    {
+        algorithm = 'sha512',
+        ttl = 86400,
+        ip = '',
+        key = '{The MAC address of the network interface}'
+        methods = [],
+        nonce = -1, // Natural numbers
+        pathname = '' // Must be a valid path contained in the url
+    }: {
+        algorithm?: string,
+        ttl?: number,
+        ip?: string,
+        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
+        methods?: string | string[],
+        nonce?: number,
+        pathname?: string // https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname
+    } = {}
+): string // URL signed
+
+verifyURL(
+    url: string,
+    {
+        algorithm = 'sha512',
+        ip = '', // will be required if it has been added to the signature
+        key = '{The MAC address of the network interface}'
+        method = '', // will be required if it has been added to the signature
+    }: {
+        algorithm?: string,
+        ip?: string,
+        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
+        method?: string
+    } = {}
+): boolean
+```
