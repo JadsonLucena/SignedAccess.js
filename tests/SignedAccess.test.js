@@ -367,4 +367,71 @@ describe('verifyCookie', () => {
 
 	});
 
+	test('custom values', () => {
+
+		let cookieSigned = signedAccess.CookieSign(prefix, { algorithm: 'sha256' });
+
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned)).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { algorithm: 'sha256' })).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign(prefix, { ip: '127.0.0.1' });
+
+		expect(() => signedAccess.verifyCookie(mockURL, cookieSigned)).toThrow('ip required');
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { ip: '142.251.129.78' })).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { ip: '127.0.0.1' })).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign(prefix, { key: 'xyz' });
+
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned)).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { key: 'xyz' })).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign(prefix, { methods: 'POST' });
+
+		expect(() => signedAccess.verifyCookie(mockURL, cookieSigned)).toThrow('method required');
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { method: 'PATCH' })).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, { method: 'POST' })).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign('https://example.com/data');
+
+		expect(signedAccess.verifyCookie('https://example.com/database', cookieSigned)).toBeTruthy();
+		expect(signedAccess.verifyCookie('https://example.com/data/file1', cookieSigned)).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign('https://example.com/data/');
+
+		expect(signedAccess.verifyCookie('https://example.com/database', cookieSigned)).toBeFalsy();
+		expect(signedAccess.verifyCookie('https://example.com/data/file1', cookieSigned)).toBeTruthy();
+
+
+		cookieSigned = signedAccess.CookieSign(prefix, {
+			ip: '127.0.0.1',
+			methods: ['POST', 'PUT'],
+			nonce: 111
+		});
+
+		expect(() => signedAccess.verifyCookie(mockURL, cookieSigned)).toThrow('ip required');
+		expect(() => signedAccess.verifyCookie(mockURL, cookieSigned, { ip: '142.251.129.78' })).toThrow('method required');
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, {
+			ip: '142.251.129.78',
+			method: 'DELETE'
+		})).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, {
+			ip: '127.0.0.1',
+			method: 'GET'
+		})).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, {
+			ip: '142.251.129.78',
+			method: 'POST'
+		})).toBeFalsy();
+		expect(signedAccess.verifyCookie(mockURL, cookieSigned, {
+			ip: '127.0.0.1',
+			method: 'PUT'
+		})).toBeTruthy();
+
+	});
+
 });
