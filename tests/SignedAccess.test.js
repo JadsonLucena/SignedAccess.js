@@ -31,4 +31,27 @@ describe('constructor', () => {
 
 	});
 
+	test('custom values', () => {
+
+		const signedAccess = new SignedAccess({
+			algorithm: 'md5',
+			ttl: 1,
+			key: 'xyz'
+		});
+
+		expect(signedAccess.algorithm).toBe('md5');
+		expect(signedAccess.ttl).toBe(1);
+		expect(signedAccess.key).toBe('xyz');
+
+
+		signedAccess.algorithm = 'sha256';
+		signedAccess.ttl = 3600;
+		signedAccess.key = 'abc';
+
+		expect(signedAccess.algorithm).toBe('sha256');
+		expect(signedAccess.ttl).toBe(3600);
+		expect(signedAccess.key).toBe('abc');
+
+	});
+
 });
