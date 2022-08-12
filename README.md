@@ -121,3 +121,8 @@ verifyURL(
     } = {}
 ): boolean
 ```
+
+> It is recommended to end all pathnames with / unless you intentionally choose to end the pathname with a partial filename.\
+> The pathname /data grants access to at least two of the following URLs:\
+> example.com/database\
+> example.com/data/file1
