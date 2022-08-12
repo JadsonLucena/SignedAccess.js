@@ -261,3 +261,22 @@ describe('verifyURL', () => {
 	});
 
 });
+
+describe('signCookie', () => {
+
+	let prefix = 'https://github.com/JadsonLucena/';
+
+
+	test('type guards', () => {
+
+		[undefined, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(input)).toThrow('Invalid prefix'));
+		['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { algorithm: input })).toThrow());
+		['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ttl: input })).toThrow('Invalid ttl'));
+		[127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ip: input })).toThrow('Invalid ip'));
+		[0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrow());
+		['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { methods: input })).toThrow('Invalid methods'));
+		['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrow('Invalid nonce'));
+
+	});
+
+});
