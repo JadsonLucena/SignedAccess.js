@@ -74,4 +74,33 @@ describe('signURL', () => {
 
 	});
 
+	test('default values', () => {
+
+		let urlSigned = signedAccess.signURL(url);
+
+		urlSigned = new URL(urlSigned);
+		let searchParams = urlSigned.searchParams;
+		let querys = Array.from(searchParams.keys());
+
+		let URLOriginal = new URL(url);
+
+		expect(urlSigned.origin).toBe(URLOriginal.origin);
+		expect(urlSigned.pathname).toBe(URLOriginal.pathname);
+		expect(urlSigned.hash).toBe(URLOriginal.hash);
+		expect(querys.length).toBe(3);
+		expect(querys).toContain('foo');
+		expect(querys).toContain('expires');
+		expect(querys).not.toContain('ip'); // reserved searchParams
+		expect(querys).not.toContain('method'); // reserved searchParams
+		expect(querys).not.toContain('nonce'); // reserved searchParams
+		expect(querys).not.toContain('prefix'); // reserved searchParams
+		expect(querys).toContain('signature');
+		expect(searchParams.get('foo')).toBe('bar');
+		expect(searchParams.get('expires')).not.toBe('anything');
+		expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now());
+		expect(searchParams.get('signature')).not.toBe('anything');
+		expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/);
+
+	});
+
 });
