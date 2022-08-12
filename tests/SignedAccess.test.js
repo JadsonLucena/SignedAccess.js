@@ -296,4 +296,37 @@ describe('signCookie', () => {
 
 	});
 
+	test('custom values', () => {
+
+		let ttl = 3600;
+		let ip = '142.251.129.78';
+		let methods = ['GET', 'POST'];
+		let nonce = 1;
+
+		let cookieSigned = signedAccess.signCookie(prefix, {
+			ttl,
+			ip,
+			methods,
+			nonce
+		});
+
+		let searchParams = new URLSearchParams(cookieSigned);
+		let querys = Array.from(searchParams.keys());
+
+		expect(querys.length).toBe(7);
+		expect(querys).toContain('expires');
+		expect(querys).toContain('ip');
+		expect(querys).toContain('method');
+		expect(querys).toContain('nonce');
+		expect(querys).toContain('prefix');
+		expect(querys).toContain('signature');
+		expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now());
+		expect(searchParams.get('ip')).toBe(ip);
+		expect(searchParams.getAll('method').sort()).toEqual(methods.sort());
+		expect(+searchParams.get('nonce')).toBe(nonce);
+		expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/);
+		expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/);
+
+	});
+
 });
