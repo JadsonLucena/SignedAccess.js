@@ -330,3 +330,24 @@ describe('signCookie', () => {
 	});
 
 });
+
+describe('verifyCookie', () => {
+
+	let prefix = 'https://github.com/JadsonLucena/';
+	let mockURL = 'https://github.com/JadsonLucena/SignedAccess.js?foo=bar#id';
+
+
+	test('type guards', () => {
+
+		let cookieSigned = signedAccess.CookieSign(prefix);
+
+		[undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(input, cookieSigned)).toThrow('Invalid URL'));
+		[undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, input)).toThrow('Invalid cookie'));
+		['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, cookieSigned, { algorithm: input })).toThrow());
+		[127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, cookieSigned, { ip: input })).toThrow('Invalid ip'));
+		[0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, cookieSigned, { key: input })).toThrow());
+		['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, cookieSigned, { method: input })).toThrow('Invalid method'));
+
+	});
+
+});
