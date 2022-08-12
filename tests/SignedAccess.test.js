@@ -147,3 +147,21 @@ describe('signURL', () => {
 	});
 
 });
+
+describe('verifyURL', () => {
+
+	let url = 'https://github.com/JadsonLucena/SignedAccess.js?foo=bar#id';
+
+	test('type guards', () => {
+
+		let urlSigned = signedAccess.URLSign(url);
+
+		[undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(input)).toThrow('Invalid URL'));
+		['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(urlSigned, { algorithm: input })).toThrow());
+		[127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(urlSigned, { ip: input })).toThrow('Invalid ip'));
+		[0, false, null].forEach(input => expect(() => signedAccess.verifyURL(urlSigned, { key: input })).toThrow());
+		['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(urlSigned, { method: input })).toThrow('Invalid method'));
+
+	});
+
+});
