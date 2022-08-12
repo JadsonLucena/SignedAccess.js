@@ -103,4 +103,47 @@ describe('signURL', () => {
 
 	});
 
+	test('custom values', () => {
+
+		let ttl = 3600;
+		let ip = '142.251.129.78';
+		let methods = ['GET', 'POST'];
+		let nonce = 1;
+		let pathname = '/JadsonLucena/';
+
+		let urlSigned = signedAccess.signURL(url, {
+			ttl,
+			ip,
+			methods,
+			nonce,
+			pathname
+		});
+
+		urlSigned = new URL(urlSigned)
+		let searchParams = urlSigned.searchParams;
+		let querys = Array.from(searchParams.keys());
+
+		let URLOriginal = new URL(url);
+
+		expect(urlSigned.origin).toBe(URLOriginal.origin);
+		expect(urlSigned.pathname).toBe(URLOriginal.pathname);
+		expect(urlSigned.hash).toBe(URLOriginal.hash);
+		expect(querys.length).toBe(8);
+		expect(querys).toContain('foo');
+		expect(querys).toContain('expires');
+		expect(querys).toContain('ip');
+		expect(querys).toContain('method');
+		expect(querys).toContain('nonce');
+		expect(querys).toContain('prefix');
+		expect(querys).toContain('signature');
+		expect(searchParams.get('foo')).toBe('bar');
+		expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now());
+		expect(searchParams.get('ip')).toBe(ip);
+		expect(searchParams.getAll('method').sort()).toEqual(methods.sort());
+		expect(+searchParams.get('nonce')).toBe(nonce);
+		expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/);
+		expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/);
+
+	});
+
 });
