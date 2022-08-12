@@ -29,3 +29,12 @@ SignedAccess(
     } = {}
 )
 ```
+
+```typescript
+// Getters
+algorithm(): string
+
+ttl(): number
+
+key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
+```
