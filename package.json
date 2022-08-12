@@ -4,34 +4,46 @@
     "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
     "main": "./src/SignedAccess.js",
     "engines": {
-      "node": ">=12"
+        "node": ">=12"
     },
     "scripts": {
-      "ci": "exit 0",
-      "test": "exit 0"
+        "test": "jest --coverage './tests'"
     },
     "files": [
-      "src/",
-      "README.md",
-      "LICENSE"
+        "src/",
+        "README.md",
+        "LICENSE"
     ],
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/JadsonLucena/SignedAccess.js.git"
+        "type": "git",
+        "url": "git+https://github.com/JadsonLucena/SignedAccess.js.git"
     },
     "keywords": [
-      "signed-access",
-      "signed-url",
-      "signed-cookie",
-      "signed",
-      "signature",
-      "sign",
-      "verify"
+        "signed-access",
+        "signed-url",
+        "signed-cookie",
+        "signed",
+        "signature",
+        "sign",
+        "verify"
     ],
     "author": "JadsonLucena <jadsonlucena@gmail.com> (https://github.com/JadsonLucena)",
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/JadsonLucena/SignedAccess.js/issues"
+        "url": "https://github.com/JadsonLucena/SignedAccess.js/issues"
     },
-    "homepage": "https://github.com/JadsonLucena/SignedAccess.js#readme"
-  }
+    "homepage": "https://github.com/JadsonLucena/SignedAccess.js#readme",
+    "devDependencies": {
+        "jest": "latest"
+    },
+    "jest": {
+        "coverageThreshold": {
+            "global": {
+                "branches": 100,
+                "functions": 100,
+                "lines": 100,
+                "statements": 100
+            }
+        }
+    }
+}
