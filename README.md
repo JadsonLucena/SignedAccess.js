@@ -13,3 +13,19 @@ The subscription ensures that the permissions for a particular resource are not 
 - [x] Possibility to restrict which HTTP methods can be used in the request
 - [x] Possibility to use nonce values to prevent replay attacks
 - [x] Possibility to allow access to multiple URLs based on a common prefix
+
+## Interfaces
+```typescript
+// Constructor
+SignedAccess(
+    {
+        algorithm = 'sha512',
+        ttl = 86400, // Seconds
+        key = '{The MAC address of the network interface}'
+    }: {
+        algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
+        ttl?: number,
+        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey // https://nodejs.org/api/os.html#osnetworkinterfaces
+    } = {}
+)
+```
