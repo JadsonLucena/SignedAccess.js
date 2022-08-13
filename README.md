@@ -1,4 +1,7 @@
 # SignedAccess
+[![Test Pass](https://github.com/JadsonLucena/SignedAccess.js/workflows/Tests/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions?workflow=Tests)
+[![Coverage Status](https://coveralls.io/repos/github/JadsonLucena/SignedAccess.js/badge.svg)](https://coveralls.io/github/JadsonLucena/SignedAccess.js)
+
 Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes
 
 ## Which is?
