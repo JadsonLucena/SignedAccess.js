@@ -129,3 +129,5 @@ verifyURL(
 > The pathname /data grants access to at least two of the following URLs:\
 > example.com/database\
 > example.com/data/file1
+
+> The URLSign method needs to save the information in the searchParams, so the "expires, ip, method, nonce, prefix and signature" queries are reserved for this module's control. If your original url has one of these queries previously, it will be removed or overwritten to avoid conflicts in the signature verification.
