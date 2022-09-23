@@ -1,49 +1,60 @@
 {
-    "name": "@jadsonlucena/signedaccess",
-    "version": "1.0.0",
-    "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
-    "main": "./src/SignedAccess.js",
-    "engines": {
-        "node": ">=12"
-    },
-    "scripts": {
-        "test": "jest --coverage './tests'"
-    },
-    "files": [
-        "src/",
-        "README.md",
-        "LICENSE"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/JadsonLucena/SignedAccess.js.git"
-    },
-    "keywords": [
-        "signed-access",
-        "signed-url",
-        "signed-cookie",
-        "signed",
-        "signature",
-        "sign",
-        "verify"
-    ],
-    "author": "JadsonLucena <jadsonlucena@gmail.com> (https://github.com/JadsonLucena)",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/JadsonLucena/SignedAccess.js/issues"
-    },
-    "homepage": "https://github.com/JadsonLucena/SignedAccess.js#readme",
-    "devDependencies": {
-        "jest": "latest"
-    },
-    "jest": {
-        "coverageThreshold": {
-            "global": {
-                "branches": 100,
-                "functions": 100,
-                "lines": 100,
-                "statements": 100
-            }
-        }
+  "name": "@jadsonlucena/signedaccess",
+  "version": "1.0.0",
+  "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
+  "main": "./src/SignedAccess.js",
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "test": "jest --coverage './tests'",
+    "eslint": "eslint './src/**' './tests/**'"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JadsonLucena/SignedAccess.js.git"
+  },
+  "keywords": [
+    "signed-access",
+    "signed-url",
+    "signed-cookie",
+    "signed",
+    "signature",
+    "sign",
+    "verify"
+  ],
+  "author": "JadsonLucena <jadsonlucena@gmail.com> (https://github.com/JadsonLucena)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JadsonLucena/SignedAccess.js/issues"
+  },
+  "homepage": "https://github.com/JadsonLucena/SignedAccess.js#readme",
+  "devDependencies": {
+    "jest": "latest",
+    "eslint": "latest",
+    "eslint-config-standard": "latest",
+    "eslint-plugin-jest": "latest"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
     }
+  },
+  "eslintConfig": {
+    "plugins": ["jest"],
+    "env": {
+        "jest/globals": true
+    },
+    "extends": "standard"
+  }
 }

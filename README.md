@@ -1,6 +1,7 @@
 # SignedAccess
 [![Test Pass](https://github.com/JadsonLucena/SignedAccess.js/workflows/Tests/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions?workflow=Tests)
 [![Coverage Status](https://coveralls.io/repos/github/JadsonLucena/SignedAccess.js/badge.svg)](https://coveralls.io/github/JadsonLucena/SignedAccess.js)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes
 
@@ -21,15 +22,15 @@ The subscription ensures that the permissions for a particular resource are not 
 ```typescript
 // Constructor
 SignedAccess(
-    {
-        algorithm = 'sha512',
-        ttl = 86400, // Seconds
-        key = '{The MAC address of the network interface}'
-    }: {
-        algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
-        ttl?: number,
-        key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey // https://nodejs.org/api/os.html#osnetworkinterfaces
-    } = {}
+  {
+    algorithm = 'sha512',
+    ttl = 86400, // Seconds
+    key = '{The MAC address of the network interface}'
+  }: {
+    algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
+    ttl?: number,
+    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey // https://nodejs.org/api/os.html#osnetworkinterfaces
+  } = {}
 )
 ```
 
@@ -130,4 +131,4 @@ verifyURL(
 > example.com/database\
 > example.com/data/file1
 
-> The URLSign method needs to save the information in the searchParams, so the "expires, ip, method, nonce, prefix and signature" queries are reserved for this module's control. If your original url has one of these queries previously, it will be removed or overwritten to avoid conflicts in the signature verification.
+> The signURL method needs to save the information in the searchParams, so the "expires, ip, method, nonce, prefix and signature" queries are reserved for this module's control. If your original url has one of these queries previously, it will be removed or overwritten to avoid conflicts in the signature verification.
