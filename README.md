@@ -85,8 +85,9 @@ key(param?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject |
  * @throws {TypeError} Invalid prefix
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid ttl
+ * @throws {TypeError} Invalid remoteAddress
  * @throws {TypeError} Invalid key
- * @throws {TypeError} Invalid methods
+ * @throws {TypeError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid nonce
  */
 signCookie(
@@ -94,16 +95,16 @@ signCookie(
   {
     algorithm = 'sha512',
     ttl = 86400,
-    ip = '', // Client IP
+    remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
-    methods = [], // Access control allow methods
+    accessControlAllowMethods = '*',
     nonce = -1 // Use random Number Once
   }: {
     algorithm?: string,
     ttl?: number,
-    ip?: string, // https://developer.mozilla.org/en-US/docs/Glossary/IP_Address
+    remoteAddress?: string, // https://developer.mozilla.org/en-US/docs/Glossary/IP_Address
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
-    methods?: string | string[], // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
+    accessControlAllowMethods?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     nonce?: number // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
   } = {}
 ): string // Cookie signed
@@ -113,8 +114,8 @@ signCookie(
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid cookie
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid ip
- * @throws {Error} ip required
+ * @throws {TypeError} Invalid remoteAddress
+ * @throws {Error} remoteAddress required
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {Error} method required
@@ -124,12 +125,12 @@ verifyCookie(
   cookie: string,
   {
     algorithm = 'sha512',
-    ip = '', // will be required if it has been added to the signature
+    remoteAddress = '', // will be required if it has been added to the signature
     key = require('os').networkInterfaces().eth0[0]?.mac,
     method = '' // will be required if it has been added to the signature
   }: {
     algorithm?: string,
-    ip?: string,
+    remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     method?: string // https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
   } = {}
@@ -140,9 +141,9 @@ verifyCookie(
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid ttl
- * @throws {TypeError} Invalid ip
+ * @throws {TypeError} Invalid remoteAddress
  * @throws {TypeError} Invalid key
- * @throws {TypeError} Invalid methods
+ * @throws {TypeError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid pathname
  */
@@ -151,17 +152,17 @@ signURL(
   {
     algorithm = 'sha512',
     ttl = 86400,
-    ip = '',
+    remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
-    methods = [],
+    accessControlAllowMethods = '*',
     nonce = -1,
     pathname = '' // Must be a valid path contained in the url
   }: {
     algorithm?: string,
     ttl?: number,
-    ip?: string,
+    remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
-    methods?: string | string[],
+    accessControlAllowMethods?: string,
     nonce?: number,
     pathname?: string // https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname
   } = {}
@@ -171,8 +172,8 @@ signURL(
  * @method
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid ip
- * @throws {Error} ip required
+ * @throws {TypeError} Invalid remoteAddress
+ * @throws {Error} remoteAddress required
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {Error} method required
@@ -181,12 +182,12 @@ verifyURL(
   url: string,
   {
     algorithm = 'sha512',
-    ip = '',
+    remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
     method = '',
   }: {
     algorithm?: string,
-    ip?: string,
+    remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     method?: string
   } = {}

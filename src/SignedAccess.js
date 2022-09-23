@@ -147,18 +147,18 @@ class SignedAccess {
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
-   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
-   * @param {string|string[]} [options.methods] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
    * @param {number} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.pathname] - Starts with / followed by the {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname URL path}, shouldn't include query parameters or fragments such as ? or #
    *
    * @throws {TypeError} Invalid url
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid ttl
-   * @throws {TypeError} Invalid ip
+   * @throws {TypeError} Invalid remoteAddress
    * @throws {TypeError} Invalid key
-   * @throws {TypeError} Invalid methods
+   * @throws {TypeError} Invalid accessControlAllowMethods
    * @throws {TypeError} Invalid nonce
    * @throws {TypeError} Invalid pathname
    *
@@ -169,24 +169,21 @@ class SignedAccess {
     {
       algorithm = this.#algorithm,
       ttl = this.#ttl,
-      ip = '',
+      remoteAddress = '',
       key = this.#key,
-      methods = [],
+      accessControlAllowMethods = '*',
       nonce = -1,
       pathname = ''
     } = {}
   ) {
     url = new URL(url)
 
-    methods = [].concat(methods)
-    methods = [...new Set(methods)]
-
     if (isNaN(ttl) || typeof ttl !== 'number' || ttl < 1) {
       throw new TypeError('Invalid ttl')
-    } else if (typeof ip !== 'string') {
-      throw new TypeError('Invalid ip')
-    } else if (!methods.every(method => typeof method === 'string' && this.#HTTPMethods.includes(method.trim().toUpperCase()))) {
-      throw new TypeError('Invalid methods')
+    } else if (typeof remoteAddress !== 'string') {
+      throw new TypeError('Invalid remoteAddress')
+    } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+      throw new TypeError('Invalid accessControlAllowMethods')
     } else if (isNaN(nonce) || typeof nonce !== 'number' || (nonce !== -1 && nonce < 0)) {
       throw new TypeError('Invalid nonce')
     } else if (typeof pathname !== 'string' || !url.pathname.startsWith(pathname)) {
@@ -203,8 +200,8 @@ class SignedAccess {
     const searchParams = new URLSearchParams()
 
     searchParams.set('expires', this.#timestamp(ttl))
-    if (ip) searchParams.set('ip', ip.trim())
-    if (methods.length) methods.forEach(method => searchParams.append('method', method.trim().toUpperCase()))
+    if (remoteAddress) searchParams.set('ip', remoteAddress.trim())
+    if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => searchParams.append('method', method))
     if (nonce >= 0) searchParams.set('nonce', nonce)
     if (pathname) searchParams.set('prefix', this.#encodePrefix(new URL(pathname, url.origin).href))
 
@@ -222,14 +219,14 @@ class SignedAccess {
    * @param {string} url - Signed {@link https://nodejs.org/api/url.html#url-strings-and-url-objects URL}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
-   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    *
    * @throws {TypeError} Invalid url
    * @throws {TypeError} Invalid algorithm
-   * @throws {TypeError} Invalid ip
-   * @throws {Error} ip required
+   * @throws {TypeError} Invalid remoteAddress
+   * @throws {Error} remoteAddress required
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {Error} method required
@@ -240,21 +237,21 @@ class SignedAccess {
     url,
     {
       algorithm = this.#algorithm,
-      ip = '',
+      remoteAddress = '',
       key = this.#key,
       method = ''
     } = {}
   ) {
     url = new URL(url)
 
-    if (typeof ip !== 'string') {
-      throw new TypeError('Invalid ip')
+    if (typeof remoteAddress !== 'string') {
+      throw new TypeError('Invalid remoteAddress')
     } else if (typeof method !== 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
       throw new TypeError('Invalid method')
     }
 
-    if (url.searchParams.has('ip') && !ip.trim()) {
-      throw new Error('ip required')
+    if (url.searchParams.has('ip') && !remoteAddress.trim()) {
+      throw new Error('remoteAddress required')
     } else if (url.searchParams.has('method') && !method.trim().toUpperCase()) {
       throw new Error('method required')
     }
@@ -276,7 +273,7 @@ class SignedAccess {
       return (
         signature === this.#toSign(searchParams.toString(), key, algorithm) &&
                 Date.now() < url.searchParams.get('expires') &&
-                (url.searchParams.has('ip') ? url.searchParams.get('ip') === ip.trim() : true) &&
+                (url.searchParams.has('ip') ? url.searchParams.get('ip') === remoteAddress.trim() : true) &&
                 (url.searchParams.has('method') ? url.searchParams.getAll('method').includes(method.trim().toUpperCase()) : true) &&
                 url.href.startsWith(this.#decodePrefix(url.searchParams.get('prefix')))
       )
@@ -284,7 +281,7 @@ class SignedAccess {
       return (
         signature === this.#toSign(url.href, key, algorithm) &&
                 Date.now() < url.searchParams.get('expires') &&
-                (url.searchParams.has('ip') ? url.searchParams.get('ip') === ip.trim() : true) &&
+                (url.searchParams.has('ip') ? url.searchParams.get('ip') === remoteAddress.trim() : true) &&
                 (url.searchParams.has('method') ? url.searchParams.getAll('method').includes(method.trim().toUpperCase()) : true)
       )
     }
@@ -296,17 +293,17 @@ class SignedAccess {
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
-   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
-   * @param {string|string[]} [options.methods] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
    * @param {number} [options.nonce=-1] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    *
    * @throws {TypeError} Invalid prefix
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid ttl
-   * @throws {TypeError} Invalid ip
+   * @throws {TypeError} Invalid remoteAddress
    * @throws {TypeError} Invalid key
-   * @throws {TypeError} Invalid methods
+   * @throws {TypeError} Invalid accessControlAllowMethods
    * @throws {TypeError} Invalid nonce
    *
    * @return {string} Signed cookie
@@ -316,23 +313,20 @@ class SignedAccess {
     {
       algorithm = this.#algorithm,
       ttl = this.#ttl,
-      ip = '',
+      remoteAddress = '',
       key = this.#key,
-      methods = [],
+      accessControlAllowMethods = '*',
       nonce = -1
     } = {}
   ) {
-    methods = [].concat(methods)
-    methods = [...new Set(methods)]
-
     if (typeof prefix !== 'string') {
       throw new TypeError('Invalid prefix')
     } else if (isNaN(ttl) || typeof ttl !== 'number' || ttl < 1) {
       throw new TypeError('Invalid ttl')
-    } else if (typeof ip !== 'string') {
-      throw new TypeError('Invalid ip')
-    } else if (!methods.every(method => typeof method === 'string' && this.#HTTPMethods.includes(method.trim().toUpperCase()))) {
-      throw new TypeError('Invalid methods')
+    } else if (typeof remoteAddress !== 'string') {
+      throw new TypeError('Invalid remoteAddress')
+    } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+      throw new TypeError('Invalid accessControlAllowMethods')
     } else if (isNaN(nonce) || typeof nonce !== 'number' || (nonce !== -1 && nonce < 0)) {
       throw new TypeError('Invalid nonce')
     }
@@ -340,8 +334,8 @@ class SignedAccess {
     const cookie = new URLSearchParams()
 
     cookie.set('expires', this.#timestamp(ttl))
-    if (ip) cookie.set('ip', ip.trim())
-    if (methods.length) methods.forEach(method => cookie.append('method', method.trim().toUpperCase()))
+    if (remoteAddress) cookie.set('ip', remoteAddress.trim())
+    if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => cookie.append('method', method))
     if (nonce >= 0) cookie.set('nonce', nonce)
     cookie.set('prefix', this.#encodePrefix(prefix))
 
@@ -356,15 +350,15 @@ class SignedAccess {
    * @param {string} cookie - Signed {@link https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Cookies cookie}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
-   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    *
    * @throws {TypeError} Invalid url
    * @throws {TypeError} Invalid cookie
    * @throws {TypeError} Invalid algorithm
-   * @throws {TypeError} Invalid ip
-   * @throws {Error} ip required
+   * @throws {TypeError} Invalid remoteAddress
+   * @throws {Error} remoteAddress required
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {Error} method required
@@ -376,7 +370,7 @@ class SignedAccess {
     cookie,
     {
       algorithm = this.#algorithm,
-      ip = '',
+      remoteAddress = '',
       key = this.#key,
       method = ''
     } = {}
@@ -386,14 +380,14 @@ class SignedAccess {
 
     if (!cookie.has('prefix') || !cookie.has('expires') || !cookie.has('signature')) {
       throw new TypeError('Invalid cookie')
-    } else if (typeof ip !== 'string') {
-      throw new TypeError('Invalid ip')
+    } else if (typeof remoteAddress !== 'string') {
+      throw new TypeError('Invalid remoteAddress')
     } else if (typeof method !== 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
       throw new TypeError('Invalid method')
     }
 
-    if (cookie.has('ip') && !ip.trim()) {
-      throw new Error('ip required')
+    if (cookie.has('ip') && !remoteAddress.trim()) {
+      throw new Error('remoteAddress required')
     } else if (cookie.has('method') && !method.trim().toUpperCase()) {
       throw new Error('method required')
     }
@@ -405,7 +399,7 @@ class SignedAccess {
     return (
       signature === this.#toSign(cookie.toString(), key, algorithm) &&
             Date.now() < cookie.get('expires') &&
-            (cookie.has('ip') ? cookie.get('ip') === ip.trim() : true) &&
+            (cookie.has('ip') ? cookie.get('ip') === remoteAddress.trim() : true) &&
             (cookie.has('method') ? cookie.getAll('method').includes(method.trim().toUpperCase()) : true) &&
             url.href.startsWith(this.#decodePrefix(cookie.get('prefix')))
     )

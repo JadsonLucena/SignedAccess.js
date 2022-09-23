@@ -47,9 +47,9 @@ describe('signURL', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signURL(input)).toThrow('Invalid URL'));
     ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { algorithm: input })).toThrow('Invalid algorithm'));
     ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ttl: input })).toThrow('Invalid ttl'));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ip: input })).toThrow('Invalid ip'));
+    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { key: input })).toThrow('Invalid key'));
-    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { methods: input })).toThrow('Invalid methods'));
+    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrow('Invalid nonce'));
     ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrow('Invalid pathname'))
   })
@@ -83,15 +83,15 @@ describe('signURL', () => {
 
   test('custom values', () => {
     const ttl = 3600
-    const ip = '142.251.129.78'
-    const methods = ['GET', 'POST']
+    const remoteAddress = '142.251.129.78'
+    const accessControlAllowMethods = 'GET,POST'
     const nonce = 1
     const pathname = '/JadsonLucena/'
 
     let signedURL = signedAccess.signURL(url, {
       ttl,
-      ip,
-      methods,
+      remoteAddress,
+      accessControlAllowMethods,
       nonce,
       pathname
     })
@@ -115,8 +115,8 @@ describe('signURL', () => {
     expect(querys).toContain('signature')
     expect(searchParams.get('foo')).toBe('bar')
     expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now())
-    expect(searchParams.get('ip')).toBe(ip)
-    expect(searchParams.getAll('method').sort()).toEqual(methods.sort())
+    expect(searchParams.get('ip')).toBe(remoteAddress)
+    expect(searchParams.getAll('method').sort()).toEqual(accessControlAllowMethods.split(',').sort())
     expect(+searchParams.get('nonce')).toBe(nonce)
     expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/)
     expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/)
@@ -131,7 +131,7 @@ describe('verifyURL', () => {
 
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(input)).toThrow('Invalid URL'));
     ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { algorithm: input })).toThrow('Invalid algorithm'));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { ip: input })).toThrow('Invalid ip'));
+    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { method: input })).toThrow('Invalid method'))
   })
@@ -141,7 +141,7 @@ describe('verifyURL', () => {
 
     expect(signedAccess.verifyURL(signedURL)).toBeTruthy()
     expect(signedAccess.verifyURL(signedURL, { algorithm: 'sha1' })).toBeFalsy()
-    expect(signedAccess.verifyURL(signedURL, { ip: '127.0.0.1' })).toBeTruthy() // should be ignored
+    expect(signedAccess.verifyURL(signedURL, { remoteAddress: '127.0.0.1' })).toBeTruthy() // should be ignored
     expect(signedAccess.verifyURL(signedURL, { key: 'anything' })).toBeFalsy()
     expect(signedAccess.verifyURL(signedURL, { method: 'POST' })).toBeTruthy() // should be ignored
   })
@@ -152,18 +152,18 @@ describe('verifyURL', () => {
     expect(signedAccess.verifyURL(signedURL)).toBeFalsy()
     expect(signedAccess.verifyURL(signedURL, { algorithm: 'sha1' })).toBeTruthy()
 
-    signedURL = signedAccess.signURL(url, { ip: '127.0.0.1' })
+    signedURL = signedAccess.signURL(url, { remoteAddress: '127.0.0.1' })
 
-    expect(() => signedAccess.verifyURL(signedURL)).toThrow('ip required')
-    expect(signedAccess.verifyURL(signedURL, { ip: '142.251.129.78' })).toBeFalsy()
-    expect(signedAccess.verifyURL(signedURL, { ip: '127.0.0.1' })).toBeTruthy()
+    expect(() => signedAccess.verifyURL(signedURL)).toThrow('remoteAddress required')
+    expect(signedAccess.verifyURL(signedURL, { remoteAddress: '142.251.129.78' })).toBeFalsy()
+    expect(signedAccess.verifyURL(signedURL, { remoteAddress: '127.0.0.1' })).toBeTruthy()
 
     signedURL = signedAccess.signURL(url, { key: 'xyz' })
 
     expect(signedAccess.verifyURL(signedURL)).toBeFalsy()
     expect(signedAccess.verifyURL(signedURL, { key: 'xyz' })).toBeTruthy()
 
-    signedURL = signedAccess.signURL(url, { methods: 'POST' })
+    signedURL = signedAccess.signURL(url, { accessControlAllowMethods: 'POST' })
 
     expect(() => signedAccess.verifyURL(signedURL)).toThrow('method required')
     expect(signedAccess.verifyURL(signedURL, { method: 'PATCH' })).toBeFalsy()
@@ -194,30 +194,30 @@ describe('verifyURL', () => {
     expect(signedAccess.verifyURL(mockSignedURL)).toBeTruthy()
 
     signedURL = signedAccess.signURL(url, {
-      ip: '127.0.0.1',
-      methods: ['POST', 'PUT'],
+      remoteAddress: '127.0.0.1',
+      accessControlAllowMethods: 'POST, PUT',
       nonce: 999,
       pathname: '/JadsonLucena/'
     })
 
     mockSignedURL = `https://github.com/JadsonLucena/WebSocket.js?${new URL(signedURL).searchParams.toString()}`
 
-    expect(() => signedAccess.verifyURL(mockSignedURL)).toThrow('ip required')
-    expect(() => signedAccess.verifyURL(mockSignedURL, { ip: '142.251.129.78' })).toThrow('method required')
+    expect(() => signedAccess.verifyURL(mockSignedURL)).toThrow('remoteAddress required')
+    expect(() => signedAccess.verifyURL(mockSignedURL, { remoteAddress: '142.251.129.78' })).toThrow('method required')
     expect(signedAccess.verifyURL(mockSignedURL, {
-      ip: '142.251.129.78',
+      remoteAddress: '142.251.129.78',
       method: 'DELETE'
     })).toBeFalsy()
     expect(signedAccess.verifyURL(mockSignedURL, {
-      ip: '127.0.0.1',
+      remoteAddress: '127.0.0.1',
       method: 'GET'
     })).toBeFalsy()
     expect(signedAccess.verifyURL(mockSignedURL, {
-      ip: '142.251.129.78',
+      remoteAddress: '142.251.129.78',
       method: 'POST'
     })).toBeFalsy()
     expect(signedAccess.verifyURL(mockSignedURL, {
-      ip: '127.0.0.1',
+      remoteAddress: '127.0.0.1',
       method: 'PUT'
     })).toBeTruthy()
   })
@@ -230,9 +230,9 @@ describe('signCookie', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(input)).toThrow('Invalid prefix'));
     ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { algorithm: input })).toThrow('Invalid algorithm'));
     ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ttl: input })).toThrow('Invalid ttl'));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ip: input })).toThrow('Invalid ip'));
+    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrow('Invalid key'));
-    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { methods: input })).toThrow('Invalid methods'));
+    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrow('Invalid nonce'))
   })
 
@@ -253,14 +253,14 @@ describe('signCookie', () => {
 
   test('custom values', () => {
     const ttl = 3600
-    const ip = '142.251.129.78'
-    const methods = ['GET', 'POST']
+    const remoteAddress = '142.251.129.78'
+    const accessControlAllowMethods = 'GET,POST'
     const nonce = 1
 
     const signedCookie = signedAccess.signCookie(prefix, {
       ttl,
-      ip,
-      methods,
+      remoteAddress,
+      accessControlAllowMethods,
       nonce
     })
 
@@ -275,8 +275,8 @@ describe('signCookie', () => {
     expect(querys).toContain('prefix')
     expect(querys).toContain('signature')
     expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now())
-    expect(searchParams.get('ip')).toBe(ip)
-    expect(searchParams.getAll('method').sort()).toEqual(methods.sort())
+    expect(searchParams.get('ip')).toBe(remoteAddress)
+    expect(searchParams.getAll('method').sort()).toEqual(accessControlAllowMethods.split(',').sort())
     expect(+searchParams.get('nonce')).toBe(nonce)
     expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/)
     expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/)
@@ -293,7 +293,7 @@ describe('verifyCookie', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(input, signedCookie)).toThrow('Invalid URL'));
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, input)).toThrow('Invalid cookie'));
     ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: input })).toThrow('Invalid algorithm'));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { ip: input })).toThrow('Invalid ip'));
+    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: input })).toThrow('Invalid method'))
   })
@@ -303,7 +303,7 @@ describe('verifyCookie', () => {
 
     expect(signedAccess.verifyCookie(mockURL, signedCookie)).toBeTruthy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: 'sha1' })).toBeFalsy()
-    expect(signedAccess.verifyCookie(mockURL, signedCookie, { ip: '127.0.0.1' })).toBeTruthy() // should be ignored
+    expect(signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '127.0.0.1' })).toBeTruthy() // should be ignored
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { key: 'anything' })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { method: 'POST' })).toBeTruthy() // should be ignored
 
@@ -318,18 +318,18 @@ describe('verifyCookie', () => {
     expect(signedAccess.verifyCookie(mockURL, signedCookie)).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: 'sha256' })).toBeTruthy()
 
-    signedCookie = signedAccess.signCookie(prefix, { ip: '127.0.0.1' })
+    signedCookie = signedAccess.signCookie(prefix, { remoteAddress: '127.0.0.1' })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('ip required')
-    expect(signedAccess.verifyCookie(mockURL, signedCookie, { ip: '142.251.129.78' })).toBeFalsy()
-    expect(signedAccess.verifyCookie(mockURL, signedCookie, { ip: '127.0.0.1' })).toBeTruthy()
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('remoteAddress required')
+    expect(signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toBeFalsy()
+    expect(signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '127.0.0.1' })).toBeTruthy()
 
     signedCookie = signedAccess.signCookie(prefix, { key: 'xyz' })
 
     expect(signedAccess.verifyCookie(mockURL, signedCookie)).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { key: 'xyz' })).toBeTruthy()
 
-    signedCookie = signedAccess.signCookie(prefix, { methods: 'POST' })
+    signedCookie = signedAccess.signCookie(prefix, { accessControlAllowMethods: 'POST' })
 
     expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('method required')
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { method: 'PATCH' })).toBeFalsy()
@@ -346,27 +346,27 @@ describe('verifyCookie', () => {
     expect(signedAccess.verifyCookie('https://example.com/data/file1', signedCookie)).toBeTruthy()
 
     signedCookie = signedAccess.signCookie(prefix, {
-      ip: '127.0.0.1',
-      methods: ['POST', 'PUT'],
+      remoteAddress: '127.0.0.1',
+      accessControlAllowMethods: 'POST, PUT',
       nonce: 111
     })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('ip required')
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { ip: '142.251.129.78' })).toThrow('method required')
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('remoteAddress required')
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toThrow('method required')
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
-      ip: '142.251.129.78',
+      remoteAddress: '142.251.129.78',
       method: 'DELETE'
     })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
-      ip: '127.0.0.1',
+      remoteAddress: '127.0.0.1',
       method: 'GET'
     })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
-      ip: '142.251.129.78',
+      remoteAddress: '142.251.129.78',
       method: 'POST'
     })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
-      ip: '127.0.0.1',
+      remoteAddress: '127.0.0.1',
       method: 'PUT'
     })).toBeTruthy()
   })
