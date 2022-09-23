@@ -3,6 +3,13 @@
 const crypto = require('crypto')
 const os = require('os')
 
+/**
+ * @class
+ * @classdesc Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes
+ *
+ * @typedef {(Int8Array|Uint8Array|Uint8ClampedArray|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array|BigInt64Array|BigUint64Array)} TypedArray
+ * @typedef {(string|ArrayBuffer|TypedArray|DataView|Buffer|KeyObject|CryptoKey)} key
+ */
 class SignedAccess {
   #algorithm
   #ttl
@@ -10,6 +17,18 @@ class SignedAccess {
 
   #HTTPMethods
 
+  /**
+   * Create a Signed Access
+   * @constructor
+   * @param {Object} [options]
+   * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   *
+   * @throws {TypeError} Invalid algorithm
+   * @throws {TypeError} Invalid ttl
+   * @throws {TypeError} Invalid key
+   */
   constructor ({
     algorithm,
     ttl,
@@ -22,18 +41,45 @@ class SignedAccess {
     this.#HTTPMethods = ['CONNECT', 'DELETE', 'GET', 'HEAD', 'OPTIONS', 'PATCH', 'POST', 'PUT', 'TRACE']
   }
 
+  /**
+   * @getter
+   * @return {string}
+   */
   get algorithm () { return this.#algorithm }
+  /**
+   * @getter
+   * @return {number}
+   */
   get ttl () { return this.#ttl }
+  /**
+   * @getter
+   * @return {key}
+   */
   get key () { return this.#key }
 
+  /**
+   * @setter
+   * @type {string}
+   * @default 'sha512'
+   * @see https://nodejs.org/api/crypto.html#cryptogethashes
+   */
   set algorithm (
     algorithm = 'sha512' // https://nodejs.org/api/crypto.html#cryptogethashes
   ) {
-    crypto.createHmac(algorithm, 'test')
+    if (typeof algorithm !== 'string' || !crypto.getHashes().includes(algorithm.trim())) {
+      throw new TypeError('Invalid algorithm')
+    }
 
     this.#algorithm = algorithm
   }
 
+  /**
+   * Time to Live in seconds
+   * @setter
+   * @type {number}
+   * @default 86400
+   * @see https://wikipedia.org/wiki/Time_to_live
+   */
   set ttl (
     ttl = 86400 // Seconds
   ) {
@@ -44,10 +90,20 @@ class SignedAccess {
     this.#ttl = ttl
   }
 
+  /**
+   * @setter
+   * @type {key}
+   * @default require('os').networkInterfaces().eth0[0]?.mac
+   * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
+   */
   set key (
-    key = os.networkInterfaces().eth0[0].mac
+    key = os.networkInterfaces().eth0[0]?.mac
   ) {
-    crypto.createHmac('sha1', key)
+    try {
+      crypto.createHmac('sha1', key)
+    } catch (err) {
+      throw new TypeError('Invalid key')
+    }
 
     this.#key = key
   }
@@ -74,9 +130,40 @@ class SignedAccess {
     key,
     algorithm
   ) {
-    return crypto.createHmac(algorithm, key).update(input).digest('base64url')
+    if (typeof algorithm !== 'string' || !crypto.getHashes().includes(algorithm.trim())) {
+      throw new TypeError('Invalid algorithm')
+    }
+
+    try {
+      return crypto.createHmac(algorithm.trim(), key).update(input).digest('base64url')
+    } catch (err) {
+      throw new TypeError('Invalid key')
+    }
   }
 
+  /**
+   * @method
+   * @param {string} url - {@link https://nodejs.org/api/url.html#url-strings-and-url-objects URL} to be signed
+   * @param {Object} [options]
+   * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {string|string[]} [options.methods] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {number} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
+   * @param {string} [options.pathname] - Starts with / followed by the {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname URL path}, shouldn't include query parameters or fragments such as ? or #
+   *
+   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid algorithm
+   * @throws {TypeError} Invalid ttl
+   * @throws {TypeError} Invalid ip
+   * @throws {TypeError} Invalid key
+   * @throws {TypeError} Invalid methods
+   * @throws {TypeError} Invalid nonce
+   * @throws {TypeError} Invalid pathname
+   *
+   * @return {string} Signed URL
+   */
   signURL (
     url,
     {
@@ -85,7 +172,7 @@ class SignedAccess {
       ip = '',
       key = this.#key,
       methods = [],
-      nonce = -1, // Natural numbers
+      nonce = -1,
       pathname = ''
     } = {}
   ) {
@@ -130,6 +217,25 @@ class SignedAccess {
     return url.href
   }
 
+  /**
+   * @method
+   * @param {string} url - Signed {@link https://nodejs.org/api/url.html#url-strings-and-url-objects URL}
+   * @param {Object} [options]
+   * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
+   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   *
+   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid algorithm
+   * @throws {TypeError} Invalid ip
+   * @throws {Error} ip required
+   * @throws {TypeError} Invalid key
+   * @throws {TypeError} Invalid method
+   * @throws {Error} method required
+   *
+   * @return {boolean}
+   */
   verifyURL (
     url,
     {
@@ -184,15 +290,36 @@ class SignedAccess {
     }
   }
 
+  /**
+   * @method
+   * @param {string} prefix - A prefix encodes a scheme (either http:// or https://), {@link Fully_qualified_domain_name FQDN}, and an optional {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname path}. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #
+   * @param {Object} [options]
+   * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {string|string[]} [options.methods] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   * @param {number} [options.nonce=-1] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
+   *
+   * @throws {TypeError} Invalid prefix
+   * @throws {TypeError} Invalid algorithm
+   * @throws {TypeError} Invalid ttl
+   * @throws {TypeError} Invalid ip
+   * @throws {TypeError} Invalid key
+   * @throws {TypeError} Invalid methods
+   * @throws {TypeError} Invalid nonce
+   *
+   * @return {string} Signed cookie
+   */
   signCookie (
-    prefix, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
+    prefix,
     {
       algorithm = this.#algorithm,
       ttl = this.#ttl,
       ip = '',
       key = this.#key,
       methods = [],
-      nonce = -1 // Natural numbers
+      nonce = -1
     } = {}
   ) {
     methods = [].concat(methods)
@@ -223,6 +350,27 @@ class SignedAccess {
     return cookie.toString()
   }
 
+  /**
+   * @method
+   * @param {string} url - Requisition {@link https://nodejs.org/api/url.html#url-strings-and-url-objects URL}
+   * @param {string} cookie - Signed {@link https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Cookies cookie}
+   * @param {Object} [options]
+   * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
+   * @param {string} [options.ip] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
+   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
+   *
+   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid cookie
+   * @throws {TypeError} Invalid algorithm
+   * @throws {TypeError} Invalid ip
+   * @throws {Error} ip required
+   * @throws {TypeError} Invalid key
+   * @throws {TypeError} Invalid method
+   * @throws {Error} method required
+   *
+   * @return {boolean}
+   */
   verifyCookie (
     url,
     cookie,

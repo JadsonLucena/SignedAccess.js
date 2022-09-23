@@ -6,9 +6,9 @@ const signedAccess = new SignedAccess()
 
 describe('constructor', () => {
   test('type guards', () => {
-    ['xyz', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input })).toThrow());
+    ['xyz', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input })).toThrow('Invalid algorithm'));
     ['xyz', -1, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input })).toThrow('Invalid ttl'));
-    [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrow())
+    [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrow('Invalid key'))
   })
 
   test('default values', () => {
@@ -45,10 +45,10 @@ describe('signURL', () => {
 
   test('type guards', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signURL(input)).toThrow('Invalid URL'));
-    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { algorithm: input })).toThrow());
+    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { algorithm: input })).toThrow('Invalid algorithm'));
     ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ttl: input })).toThrow('Invalid ttl'));
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ip: input })).toThrow('Invalid ip'));
-    [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { key: input })).toThrow());
+    [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { methods: input })).toThrow('Invalid methods'));
     ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrow('Invalid nonce'));
     ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrow('Invalid pathname'))
@@ -130,9 +130,9 @@ describe('verifyURL', () => {
     const signedURL = signedAccess.signURL(url);
 
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(input)).toThrow('Invalid URL'));
-    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { algorithm: input })).toThrow());
+    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { algorithm: input })).toThrow('Invalid algorithm'));
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { ip: input })).toThrow('Invalid ip'));
-    [0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { key: input })).toThrow());
+    [0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { method: input })).toThrow('Invalid method'))
   })
 
@@ -228,10 +228,10 @@ describe('signCookie', () => {
 
   test('type guards', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(input)).toThrow('Invalid prefix'));
-    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { algorithm: input })).toThrow());
+    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { algorithm: input })).toThrow('Invalid algorithm'));
     ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ttl: input })).toThrow('Invalid ttl'));
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ip: input })).toThrow('Invalid ip'));
-    [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrow());
+    [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { methods: input })).toThrow('Invalid methods'));
     ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrow('Invalid nonce'))
   })
@@ -292,9 +292,9 @@ describe('verifyCookie', () => {
 
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(input, signedCookie)).toThrow('Invalid URL'));
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, input)).toThrow('Invalid cookie'));
-    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: input })).toThrow());
+    ['xyz', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: input })).toThrow('Invalid algorithm'));
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { ip: input })).toThrow('Invalid ip'));
-    [0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { key: input })).toThrow());
+    [0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: input })).toThrow('Invalid method'))
   })
 
