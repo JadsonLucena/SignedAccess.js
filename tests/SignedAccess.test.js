@@ -1,5 +1,7 @@
 'use strict'
 
+const crypto = require('crypto')
+
 const SignedAccess = require('../src/SignedAccess.js')
 
 const signedAccess = new SignedAccess()
@@ -50,7 +52,7 @@ describe('signURL', () => {
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
-    ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrow('Invalid nonce'));
+    [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrow('Invalid nonce'));
     ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrow('Invalid pathname'))
   })
 
@@ -85,7 +87,7 @@ describe('signURL', () => {
     const ttl = 3600
     const remoteAddress = '142.251.129.78'
     const accessControlAllowMethods = 'GET,POST'
-    const nonce = 1
+    const nonce = crypto.randomUUID()
     const pathname = '/JadsonLucena/'
 
     let signedURL = signedAccess.signURL(url, {
@@ -117,7 +119,7 @@ describe('signURL', () => {
     expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now())
     expect(searchParams.get('ip')).toBe(remoteAddress)
     expect(searchParams.getAll('method').sort()).toEqual(accessControlAllowMethods.split(',').sort())
-    expect(+searchParams.get('nonce')).toBe(nonce)
+    expect(searchParams.get('nonce')).toBe(nonce)
     expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/)
     expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/)
   })
@@ -196,7 +198,7 @@ describe('verifyURL', () => {
     signedURL = signedAccess.signURL(url, {
       remoteAddress: '127.0.0.1',
       accessControlAllowMethods: 'POST, PUT',
-      nonce: 999,
+      nonce: crypto.randomUUID(),
       pathname: '/JadsonLucena/'
     })
 
@@ -233,7 +235,7 @@ describe('signCookie', () => {
     [127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrow('Invalid key'));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
-    ['xyz', -2, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrow('Invalid nonce'))
+    [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrow('Invalid nonce'))
   })
 
   test('default values', () => {
@@ -255,7 +257,7 @@ describe('signCookie', () => {
     const ttl = 3600
     const remoteAddress = '142.251.129.78'
     const accessControlAllowMethods = 'GET,POST'
-    const nonce = 1
+    const nonce = crypto.randomUUID()
 
     const signedCookie = signedAccess.signCookie(prefix, {
       ttl,
@@ -277,7 +279,7 @@ describe('signCookie', () => {
     expect(parseInt(searchParams.get('expires'))).toBeGreaterThan(Date.now())
     expect(searchParams.get('ip')).toBe(remoteAddress)
     expect(searchParams.getAll('method').sort()).toEqual(accessControlAllowMethods.split(',').sort())
-    expect(+searchParams.get('nonce')).toBe(nonce)
+    expect(searchParams.get('nonce')).toBe(nonce)
     expect(searchParams.get('prefix')).toMatch(/[A-Za-z0-9-_.~]+/)
     expect(searchParams.get('signature')).toMatch(/[A-Za-z0-9-_.~]+/)
   })
@@ -348,7 +350,7 @@ describe('verifyCookie', () => {
     signedCookie = signedAccess.signCookie(prefix, {
       remoteAddress: '127.0.0.1',
       accessControlAllowMethods: 'POST, PUT',
-      nonce: 111
+      nonce: crypto.randomUUID()
     })
 
     expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('remoteAddress required')

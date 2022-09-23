@@ -98,14 +98,14 @@ signCookie(
     remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
     accessControlAllowMethods = '*',
-    nonce = -1 // Use random Number Once
+    nonce = ''
   }: {
     algorithm?: string,
     ttl?: number,
     remoteAddress?: string, // https://developer.mozilla.org/en-US/docs/Glossary/IP_Address
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     accessControlAllowMethods?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
-    nonce?: number // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
+    nonce?: string // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
   } = {}
 ): string // Cookie signed
 
@@ -155,7 +155,7 @@ signURL(
     remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
     accessControlAllowMethods = '*',
-    nonce = -1,
+    nonce = '',
     pathname = '' // Must be a valid path contained in the url
   }: {
     algorithm?: string,
@@ -163,7 +163,7 @@ signURL(
     remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     accessControlAllowMethods?: string,
-    nonce?: number,
+    nonce?: string,
     pathname?: string // https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname
   } = {}
 ): string // URL signed

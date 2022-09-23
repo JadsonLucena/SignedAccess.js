@@ -150,7 +150,7 @@ class SignedAccess {
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
-   * @param {number} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
+   * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.pathname] - Starts with / followed by the {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname URL path}, shouldn't include query parameters or fragments such as ? or #
    *
    * @throws {TypeError} Invalid url
@@ -172,7 +172,7 @@ class SignedAccess {
       remoteAddress = '',
       key = this.#key,
       accessControlAllowMethods = '*',
-      nonce = -1,
+      nonce = '',
       pathname = ''
     } = {}
   ) {
@@ -184,7 +184,7 @@ class SignedAccess {
       throw new TypeError('Invalid remoteAddress')
     } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
       throw new TypeError('Invalid accessControlAllowMethods')
-    } else if (isNaN(nonce) || typeof nonce !== 'number' || (nonce !== -1 && nonce < 0)) {
+    } else if (typeof nonce !== 'string') {
       throw new TypeError('Invalid nonce')
     } else if (typeof pathname !== 'string' || !url.pathname.startsWith(pathname)) {
       throw new TypeError('Invalid pathname')
@@ -202,7 +202,7 @@ class SignedAccess {
     searchParams.set('expires', this.#timestamp(ttl))
     if (remoteAddress) searchParams.set('ip', remoteAddress.trim())
     if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => searchParams.append('method', method))
-    if (nonce >= 0) searchParams.set('nonce', nonce)
+    if (nonce) searchParams.set('nonce', nonce.trim())
     if (pathname) searchParams.set('prefix', this.#encodePrefix(new URL(pathname, url.origin).href))
 
     for (const pair of searchParams.entries()) {
@@ -296,7 +296,7 @@ class SignedAccess {
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
-   * @param {number} [options.nonce=-1] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
+   * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    *
    * @throws {TypeError} Invalid prefix
    * @throws {TypeError} Invalid algorithm
@@ -316,7 +316,7 @@ class SignedAccess {
       remoteAddress = '',
       key = this.#key,
       accessControlAllowMethods = '*',
-      nonce = -1
+      nonce = ''
     } = {}
   ) {
     if (typeof prefix !== 'string') {
@@ -327,7 +327,7 @@ class SignedAccess {
       throw new TypeError('Invalid remoteAddress')
     } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
       throw new TypeError('Invalid accessControlAllowMethods')
-    } else if (isNaN(nonce) || typeof nonce !== 'number' || (nonce !== -1 && nonce < 0)) {
+    } else if (typeof nonce !== 'string') {
       throw new TypeError('Invalid nonce')
     }
 
@@ -336,7 +336,7 @@ class SignedAccess {
     cookie.set('expires', this.#timestamp(ttl))
     if (remoteAddress) cookie.set('ip', remoteAddress.trim())
     if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => cookie.append('method', method))
-    if (nonce >= 0) cookie.set('nonce', nonce)
+    if (nonce) cookie.set('nonce', nonce.trim())
     cookie.set('prefix', this.#encodePrefix(prefix))
 
     cookie.set('signature', this.#toSign(cookie.toString(), key, algorithm))
