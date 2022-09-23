@@ -200,10 +200,10 @@ class SignedAccess {
     const searchParams = new URLSearchParams()
 
     searchParams.set('expires', this.#timestamp(ttl))
-    if (remoteAddress) searchParams.set('ip', remoteAddress.trim())
-    if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => searchParams.append('method', method))
-    if (nonce) searchParams.set('nonce', nonce.trim())
-    if (pathname) searchParams.set('prefix', this.#encodePrefix(new URL(pathname, url.origin).href))
+    if (remoteAddress.trim()) searchParams.set('ip', remoteAddress.trim())
+    if (accessControlAllowMethods.trim() && accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => searchParams.append('method', method))
+    if (nonce.trim()) searchParams.set('nonce', nonce.trim())
+    if (pathname.trim()) searchParams.set('prefix', this.#encodePrefix(new URL(pathname.trim(), url.origin).href))
 
     for (const pair of searchParams.entries()) {
       url.searchParams.append(pair[0], pair[1])
@@ -252,7 +252,7 @@ class SignedAccess {
 
     if (url.searchParams.has('ip') && !remoteAddress.trim()) {
       throw new Error('remoteAddress required')
-    } else if (url.searchParams.has('method') && !method.trim().toUpperCase()) {
+    } else if (url.searchParams.has('method') && !method.trim()) {
       throw new Error('method required')
     }
 
@@ -334,10 +334,10 @@ class SignedAccess {
     const cookie = new URLSearchParams()
 
     cookie.set('expires', this.#timestamp(ttl))
-    if (remoteAddress) cookie.set('ip', remoteAddress.trim())
-    if (accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => cookie.append('method', method))
-    if (nonce) cookie.set('nonce', nonce.trim())
-    cookie.set('prefix', this.#encodePrefix(prefix))
+    if (remoteAddress.trim()) cookie.set('ip', remoteAddress.trim())
+    if (accessControlAllowMethods.trim() && accessControlAllowMethods.trim() !== '*') [...new Set(accessControlAllowMethods.split(',').map(method => method.trim().toUpperCase()))].forEach(method => cookie.append('method', method))
+    if (nonce.trim()) cookie.set('nonce', nonce.trim())
+    cookie.set('prefix', this.#encodePrefix(prefix.trim()))
 
     cookie.set('signature', this.#toSign(cookie.toString(), key, algorithm))
 
@@ -388,7 +388,7 @@ class SignedAccess {
 
     if (cookie.has('ip') && !remoteAddress.trim()) {
       throw new Error('remoteAddress required')
-    } else if (cookie.has('method') && !method.trim().toUpperCase()) {
+    } else if (cookie.has('method') && !method.trim()) {
       throw new Error('method required')
     }
 
