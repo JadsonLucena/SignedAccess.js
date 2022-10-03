@@ -112,7 +112,7 @@ class SignedAccess {
     prefix = new URL(prefix)
 
     // The prefix shouldn't include query parameters or fragments such as ? or #
-    return Buffer.from(prefix.origin + prefix.pathname, 'ascii').toString('base64url')
+    return Buffer.from(decodeURIComponent(prefix.origin + prefix.pathname), 'ascii').toString('base64url')
   }
 
   #decodePrefix (prefix) {
@@ -135,7 +135,7 @@ class SignedAccess {
     }
 
     try {
-      return crypto.createHmac(algorithm.trim(), key).update(input).digest('base64url')
+      return crypto.createHmac(algorithm.trim(), key).update(decodeURIComponent(input)).digest('base64url')
     } catch (err) {
       throw new TypeError('Invalid key')
     }
@@ -186,7 +186,7 @@ class SignedAccess {
       throw new TypeError('Invalid accessControlAllowMethods')
     } else if (typeof nonce !== 'string') {
       throw new TypeError('Invalid nonce')
-    } else if (typeof pathname !== 'string' || !url.pathname.startsWith(pathname)) {
+    } else if (typeof pathname !== 'string' || !decodeURIComponent(url.pathname).startsWith(pathname)) {
       throw new TypeError('Invalid pathname')
     }
 
@@ -211,7 +211,7 @@ class SignedAccess {
 
     url.searchParams.set('signature', this.#toSign(searchParams.has('prefix') ? searchParams.toString() : url.href, key, algorithm))
 
-    return url.href
+    return decodeURIComponent(url.href)
   }
 
   /**
@@ -275,7 +275,7 @@ class SignedAccess {
                 Date.now() < url.searchParams.get('expires') &&
                 (url.searchParams.has('ip') ? url.searchParams.get('ip') === remoteAddress.trim() : true) &&
                 (url.searchParams.has('method') ? url.searchParams.getAll('method').includes(method.trim().toUpperCase()) : true) &&
-                url.href.startsWith(this.#decodePrefix(url.searchParams.get('prefix')))
+                decodeURIComponent(url.href).startsWith(this.#decodePrefix(url.searchParams.get('prefix')))
       )
     } else {
       return (
@@ -401,7 +401,7 @@ class SignedAccess {
             Date.now() < cookie.get('expires') &&
             (cookie.has('ip') ? cookie.get('ip') === remoteAddress.trim() : true) &&
             (cookie.has('method') ? cookie.getAll('method').includes(method.trim().toUpperCase()) : true) &&
-            url.href.startsWith(this.#decodePrefix(cookie.get('prefix')))
+            decodeURIComponent(url.href).startsWith(this.#decodePrefix(cookie.get('prefix')))
     )
   }
 }
