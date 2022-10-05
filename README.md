@@ -200,3 +200,5 @@ verifyURL(
 > example.com/data/file1
 
 > The signURL method needs to save the information in the searchParams, so the "expires, ip, method, nonce, prefix and signature" queries are reserved for this module's control. If your original url has one of these queries previously, it will be removed or overwritten to avoid conflicts in the signature verification.
+
+> The nonce is signed in the cookie or URL, but it's up to your application to save them and check if they've already been used.
