@@ -251,9 +251,9 @@ class SignedAccess {
     }
 
     if (url.searchParams.has('method') && !method.trim()) {
-      throw new Error('method required')
+      throw new SyntaxError('method required')
     } else if (url.searchParams.has('ip') && !remoteAddress.trim()) {
-      throw new Error('remoteAddress required')
+      throw new SyntaxError('remoteAddress required')
     }
 
     const signature = url.searchParams.get('signature')
@@ -387,9 +387,9 @@ class SignedAccess {
     }
 
     if (cookie.has('method') && !method.trim()) {
-      throw new Error('method required')
+      throw new SyntaxError('method required')
     } else if (cookie.has('ip') && !remoteAddress.trim()) {
-      throw new Error('remoteAddress required')
+      throw new SyntaxError('remoteAddress required')
     }
 
     const signature = cookie.get('signature')

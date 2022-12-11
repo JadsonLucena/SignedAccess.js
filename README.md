@@ -118,8 +118,8 @@ signCookie(
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
- * @throws {Error} method required
- * @throws {Error} remoteAddress required
+ * @throws {SyntaxError} method required
+ * @throws {SyntaxError} remoteAddress required
  */
 verifyCookie(
   url: string,
@@ -176,8 +176,8 @@ signURL(
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
- * @throws {Error} method required
- * @throws {Error} remoteAddress required
+ * @throws {SyntaxError} method required
+ * @throws {SyntaxError} remoteAddress required
  */
 verifyURL(
   url: string,
