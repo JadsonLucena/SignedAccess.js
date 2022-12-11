@@ -24,19 +24,19 @@ The subscription ensures that the permissions for a particular resource are not 
 /**
  * @constructor
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid ttl
  * @throws {TypeError} Invalid key
+ * @throws {TypeError} Invalid ttl
  */
 SignedAccess(
   {
     algorithm = 'sha512',
-    ttl = 86400, // Time to Live in seconds
-    key = require('os').networkInterfaces().eth0[0]?.mac
+    key = require('os').networkInterfaces().eth0[0]?.mac,
+    ttl = 86400 // Time to Live in seconds
   }: {
     algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
-    ttl?: number, // https://wikipedia.org/wiki/Time_to_live
-    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
-  } = {}
+    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
+    ttl?: number // https://wikipedia.org/wiki/Time_to_live
+  }
 )
 ```
 
@@ -49,12 +49,12 @@ algorithm(): string
 /**
  * @getter
  */
-ttl(): number
+key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
 
 /**
  * @getter
  */
-key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
+ttl(): number
 ```
 
 ```typescript
@@ -67,39 +67,39 @@ algorithm(param?: string = 'sha512'): void
 
 /**
  * @setter
- * @throws {TypeError} Invalid ttl
- * @see https://wikipedia.org/wiki/Time_to_live
- */
-ttl(param?: number = 86400): void
-
-/**
- * @setter
  * @throws {TypeError} Invalid key
  * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
  */
 key(param?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey) = require('os').networkInterfaces().eth0[0]?.mac): void
+
+/**
+ * @setter
+ * @throws {TypeError} Invalid ttl
+ * @see https://wikipedia.org/wiki/Time_to_live
+ */
+ttl(param?: number = 86400): void
 ```
 
 ```typescript
 /**
  * @method
  * @throws {TypeError} Invalid prefix
- * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid ttl
- * @throws {TypeError} Invalid remoteAddress
- * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid accessControlAllowMethods
+ * @throws {TypeError} Invalid algorithm
+ * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
+ * @throws {TypeError} Invalid remoteAddress
+ * @throws {TypeError} Invalid ttl
  */
 signCookie(
   prefix: string, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
   {
-    algorithm = 'sha512',
-    ttl = 86400,
-    remoteAddress = '',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
     accessControlAllowMethods = '*',
-    nonce = ''
+    algorithm = 'sha512',
+    key = require('os').networkInterfaces().eth0[0]?.mac,
+    nonce = '',
+    remoteAddress = '',
+    ttl = 86400
   }: {
     algorithm?: string,
     ttl?: number,
@@ -107,7 +107,7 @@ signCookie(
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     accessControlAllowMethods?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     nonce?: string // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
-  } = {}
+  }
 ): string // Cookie signed
 
 /**
@@ -115,83 +115,83 @@ signCookie(
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid cookie
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid remoteAddress
- * @throws {Error} remoteAddress required
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
+ * @throws {TypeError} Invalid remoteAddress
  * @throws {Error} method required
+ * @throws {Error} remoteAddress required
  */
 verifyCookie(
   url: string,
   cookie: string,
   {
     algorithm = 'sha512',
-    remoteAddress = '', // will be required if it has been added to the signature
     key = require('os').networkInterfaces().eth0[0]?.mac,
-    method = '' // will be required if it has been added to the signature
+    method = '', // will be required if it has been added to the signature
+    remoteAddress = '' // will be required if it has been added to the signature
   }: {
     algorithm?: string,
-    remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
-    method?: string // https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
-  } = {}
+    method?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+    remoteAddress?: string
+  }
 ): boolean
 
 /**
  * @method
  * @throws {TypeError} Invalid url
- * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid ttl
- * @throws {TypeError} Invalid remoteAddress
- * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid accessControlAllowMethods
+ * @throws {TypeError} Invalid algorithm
+ * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid pathname
+ * @throws {TypeError} Invalid remoteAddress
+ * @throws {TypeError} Invalid ttl
  */
 signURL(
   url: string,
   {
-    algorithm = 'sha512',
-    ttl = 86400,
-    remoteAddress = '',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
     accessControlAllowMethods = '*',
+    algorithm = 'sha512',
+    key = require('os').networkInterfaces().eth0[0]?.mac,
     nonce = '',
-    pathname = '' // Must be a valid path contained in the url
+    pathname = '', // Must be a valid path contained in the url
+    remoteAddress = '',
+    ttl = 86400
   }: {
-    algorithm?: string,
-    ttl?: number,
-    remoteAddress?: string,
-    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     accessControlAllowMethods?: string,
+    algorithm?: string,
+    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     nonce?: string,
-    pathname?: string // https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname
-  } = {}
+    pathname?: string, // https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname
+    remoteAddress?: string,
+    ttl?: number
+  }
 ): string // URL signed
 
 /**
  * @method
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid remoteAddress
- * @throws {Error} remoteAddress required
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
+ * @throws {TypeError} Invalid remoteAddress
  * @throws {Error} method required
+ * @throws {Error} remoteAddress required
  */
 verifyURL(
   url: string,
   {
     algorithm = 'sha512',
-    remoteAddress = '',
     key = require('os').networkInterfaces().eth0[0]?.mac,
     method = '',
+    remoteAddress = ''
   }: {
     algorithm?: string,
-    remoteAddress?: string,
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
-    method?: string
-  } = {}
+    method?: string,
+    remoteAddress?: string
+  }
 ): boolean
 ```
 
