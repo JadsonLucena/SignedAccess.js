@@ -204,7 +204,7 @@ describe('verifyURL', () => {
 
     mockSignedURL = `https://github.com/JadsonLucena/WebSocket.js?${new URL(signedURL).searchParams.toString()}`
 
-    expect(() => signedAccess.verifyURL(mockSignedURL)).toThrow('remoteAddress required')
+    expect(() => signedAccess.verifyURL(mockSignedURL, { method: 'POST' })).toThrow('remoteAddress required')
     expect(() => signedAccess.verifyURL(mockSignedURL, { remoteAddress: '142.251.129.78' })).toThrow('method required')
     expect(signedAccess.verifyURL(mockSignedURL, {
       remoteAddress: '142.251.129.78',
@@ -353,7 +353,7 @@ describe('verifyCookie', () => {
       nonce: crypto.randomUUID()
     })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrow('remoteAddress required')
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: 'POST' })).toThrow('remoteAddress required')
     expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toThrow('method required')
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
       remoteAddress: '142.251.129.78',
