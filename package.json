@@ -7,8 +7,8 @@
     "node": ">=12"
   },
   "scripts": {
-    "test": "jest --coverage './tests'",
-    "eslint": "eslint './src/**' './tests/**'"
+    "test": "jest --coverage './test'",
+    "eslint": "eslint './src/**' './test/**'"
   },
   "files": [
     "src/",
