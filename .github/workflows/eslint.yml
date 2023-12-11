@@ -25,4 +25,4 @@ jobs:
           node-version: latest
 
       - run: npm install
-      - run: npm run eslint
+      - run: npm run lint

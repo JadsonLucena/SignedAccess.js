@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "jest --coverage './test'",
-    "eslint": "eslint './src/**' './test/**'"
+    "lint": "eslint ./src ./test --ext .js"
   },
   "files": [
     "src/",
@@ -23,10 +23,11 @@
     "signed-access",
     "signed-url",
     "signed-cookie",
-    "signed",
-    "signature",
-    "sign",
-    "verify"
+    "signed-requests",
+    "access-control",
+    "access-integrity",
+    "access-token",
+    "session-security"
   ],
   "author": "JadsonLucena <jadsonlucena@gmail.com> (https://github.com/JadsonLucena)",
   "license": "MIT",
