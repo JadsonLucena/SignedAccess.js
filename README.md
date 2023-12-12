@@ -1,4 +1,5 @@
 # SignedAccess
+[![CodeQL](https://github.com/JadsonLucena/SignedAccess.js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions/workflows/github-code-scanning/codeql)
 [![Test Pass](https://github.com/JadsonLucena/SignedAccess.js/workflows/Tests/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions?workflow=Tests)
 [![Coverage Status](https://coveralls.io/repos/github/JadsonLucena/SignedAccess.js/badge.svg)](https://coveralls.io/github/JadsonLucena/SignedAccess.js)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -203,3 +204,6 @@ verifyURL(
 > The signURL method needs to save the information in the searchParams, so the "expires, ip, method, nonce, prefix and signature" queries are reserved for this module's control. If your original url has one of these queries previously, it will be removed or overwritten to avoid conflicts in the signature verification.
 
 > The nonce is signed in the cookie or URL, but it's up to your application to save them and check if they've already been used.
+
+## Specifications
+We strive to maintain complete code coverage in tests. With that, we provide all the necessary use cases for a good understanding of how this module works. See: [test/SignedAccess.spec.js](https://github.com/JadsonLucena/SignedAccess.js/blob/main/test/SignedAccess.spec.js)
