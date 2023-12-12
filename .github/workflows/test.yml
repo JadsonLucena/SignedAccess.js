@@ -1,14 +1,12 @@
-name: Tests
+name: test
 
 on:
   push:
     paths:
       - 'src/**'
-      - 'tests/**'
   pull_request:
     paths:
       - 'src/**'
-      - 'tests/**'
 
 jobs:
 
@@ -29,4 +27,4 @@ jobs:
 
       - uses: coverallsapp/github-action@master
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{secrets.GITHUB_TOKEN}}

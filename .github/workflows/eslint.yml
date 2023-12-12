@@ -1,18 +1,18 @@
-name: ESLint
+name: eslint
 
 on:
   push:
     paths:
       - 'src/**'
-      - 'tests/**'
+      - 'test/**'
   pull_request:
     paths:
       - 'src/**'
-      - 'tests/**'
+      - 'test/**'
 
 jobs:
 
-  test:
+  eslint:
 
     runs-on: ubuntu-latest
 
