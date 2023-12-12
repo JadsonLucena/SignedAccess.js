@@ -1,4 +1,4 @@
-name: Publish Package
+name: publish
 
 on:
   release:
@@ -13,7 +13,7 @@ jobs:
     steps:
 
       - uses: actions/checkout@main
-      
+
       - uses: actions/setup-node@main
         with:
           node-version: latest
@@ -23,7 +23,7 @@ jobs:
       - run: npm pack --dry-run
       - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
   
   npm:
 
@@ -32,7 +32,7 @@ jobs:
     steps:
 
       - uses: actions/checkout@main
-      
+
       - uses: actions/setup-node@main
         with:
           node-version: latest
@@ -42,4 +42,4 @@ jobs:
       - run: npm pack --dry-run
       - run: npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
