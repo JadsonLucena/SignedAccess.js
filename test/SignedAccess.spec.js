@@ -1,6 +1,6 @@
 'use strict'
 
-const crypto = require('crypto')
+const crypto = require('node:crypto')
 
 const SignedAccess = require('../src/SignedAccess.js')
 
@@ -9,7 +9,7 @@ const signedAccess = new SignedAccess()
 describe('constructor', () => {
   test('type guards', () => {
     ['xyz', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input })).toThrow('Invalid algorithm'));
-    ['xyz', -1, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input })).toThrow('Invalid ttl'));
+    ['xyz', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input })).toThrow('Invalid ttl'));
     [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrow('Invalid key'))
   })
 
