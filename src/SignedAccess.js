@@ -1,7 +1,7 @@
 'use strict'
 
-const crypto = require('crypto')
-const os = require('os')
+const crypto = require('node:crypto')
+const os = require('node:os')
 
 /**
  * @class
@@ -101,7 +101,7 @@ class SignedAccess {
   set ttl (
     ttl = 86400 // Seconds
   ) {
-    if (isNaN(ttl) || typeof ttl !== 'number' || ttl < 1) {
+    if (!Number.isSafeInteger(ttl) || ttl < 1) {
       throw new TypeError('Invalid ttl')
     }
 
@@ -186,7 +186,7 @@ class SignedAccess {
       throw new TypeError('Invalid pathname')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
-    } else if (isNaN(ttl) || typeof ttl !== 'number' || ttl < 1) {
+    } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
       throw new TypeError('Invalid ttl')
     }
 
@@ -327,7 +327,7 @@ class SignedAccess {
       throw new TypeError('Invalid nonce')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
-    } else if (isNaN(ttl) || typeof ttl !== 'number' || ttl < 1) {
+    } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
       throw new TypeError('Invalid ttl')
     }
 

@@ -1,13 +1,13 @@
 {
   "name": "@jadsonlucena/signedaccess",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
   "main": "./src/SignedAccess.js",
   "engines": {
     "node": ">=12"
   },
   "scripts": {
-    "test": "jest --coverage './test'",
+    "test": "jest --coverage ./test",
     "lint": "eslint ./src ./test --ext .js"
   },
   "files": [
@@ -39,9 +39,15 @@
     "jest": "latest",
     "eslint": "latest",
     "eslint-config-standard": "latest",
-    "eslint-plugin-jest": "latest"
+    "eslint-plugin-jest": "latest",
+    "@commitlint/cli": "latest",
+    "@commitlint/config-conventional": "latest"
   },
   "jest": {
+    "collectCoverage": true,
+    "verbose": true,
+    "collectCoverageFrom": ["./src/*.js"],
+    "coverageReporters": ["clover", "json", "lcov", "text", "html"],
     "coverageThreshold": {
       "global": {
         "branches": 100,
@@ -57,5 +63,8 @@
         "jest/globals": true
     },
     "extends": "standard"
+  },
+  "commitlint": {
+    "extends": ["@commitlint/config-conventional"]
   }
 }
