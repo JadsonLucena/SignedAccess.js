@@ -42,39 +42,27 @@ SignedAccess(
 ```
 
 ```typescript
-/**
- * @getter
- */
+// Getters
 algorithm(): string
-
-/**
- * @getter
- */
 key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
-
-/**
- * @getter
- */
 ttl(): number
 ```
 
 ```typescript
+// Setters
 /**
- * @setter
  * @throws {TypeError} Invalid algorithm
  * @see https://nodejs.org/api/crypto.html#cryptogethashes
  */
 algorithm(param?: string = 'sha512'): void
 
 /**
- * @setter
  * @throws {TypeError} Invalid key
  * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
  */
 key(param?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey) = require('os').networkInterfaces().eth0[0]?.mac): void
 
 /**
- * @setter
  * @throws {TypeError} Invalid ttl
  * @see https://wikipedia.org/wiki/Time_to_live
  */
