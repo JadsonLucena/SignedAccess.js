@@ -1,6 +1,6 @@
 {
   "name": "@jadsonlucena/signedaccess",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
   "main": "./src/SignedAccess.js",
   "engines": {
@@ -27,6 +27,7 @@
     "access-control",
     "access-integrity",
     "access-token",
+    "token-url",
     "session-security"
   ],
   "author": "JadsonLucena <jadsonlucena@gmail.com> (https://github.com/JadsonLucena)",
@@ -60,7 +61,7 @@
   "eslintConfig": {
     "plugins": ["jest"],
     "env": {
-        "jest/globals": true
+      "jest/globals": true
     },
     "extends": "standard"
   },
