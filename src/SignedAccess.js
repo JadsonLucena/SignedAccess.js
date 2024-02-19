@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto')
 const os = require('node:os')
+const net = require('node:net')
 
 /**
  * @class
@@ -160,6 +161,7 @@ class SignedAccess {
    * @throws {TypeError} Invalid nonce
    * @throws {TypeError} Invalid pathname
    * @throws {TypeError} Invalid remoteAddress
+   * @throws {SyntaxError} Invalid remoteAddress
    * @throws {TypeError} Invalid ttl
    *
    * @return {string} Signed URL
@@ -186,6 +188,8 @@ class SignedAccess {
       throw new TypeError('Invalid pathname')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
+    } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
+      throw new SyntaxError('Invalid remoteAddress')
     } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
       throw new TypeError('Invalid ttl')
     }
@@ -228,6 +232,7 @@ class SignedAccess {
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {TypeError} Invalid remoteAddress
+   * @throws {SyntaxError} Invalid remoteAddress
    * @throws {Error} method required
    * @throws {Error} remoteAddress required
    *
@@ -248,6 +253,8 @@ class SignedAccess {
       throw new TypeError('Invalid method')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
+    } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
+      throw new SyntaxError('Invalid remoteAddress')
     }
 
     if (url.searchParams.has('method') && !method.trim()) {
@@ -304,6 +311,7 @@ class SignedAccess {
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid nonce
    * @throws {TypeError} Invalid remoteAddress
+   * @throws {SyntaxError} Invalid remoteAddress
    * @throws {TypeError} Invalid ttl
    *
    * @return {string} Signed cookie
@@ -327,6 +335,8 @@ class SignedAccess {
       throw new TypeError('Invalid nonce')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
+    } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
+      throw new SyntaxError('Invalid remoteAddress')
     } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
       throw new TypeError('Invalid ttl')
     }
@@ -360,6 +370,7 @@ class SignedAccess {
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {TypeError} Invalid remoteAddress
+   * @throws {SyntaxError} Invalid remoteAddress
    * @throws {Error} method required
    * @throws {Error} remoteAddress required
    *
@@ -384,6 +395,8 @@ class SignedAccess {
       throw new TypeError('Invalid method')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
+    } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
+      throw new SyntaxError('Invalid remoteAddress')
     }
 
     if (cookie.has('method') && !method.trim()) {

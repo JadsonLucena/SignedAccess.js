@@ -20,6 +20,7 @@ The subscription ensures that the permissions for a particular resource are not 
 - [x] Possibility to use nonce values to prevent replay attacks
 - [x] Possibility to allow access to multiple URLs based on a common prefix
 
+
 ## Interfaces
 ```typescript
 /**
@@ -32,7 +33,7 @@ SignedAccess(
   {
     algorithm = 'sha512',
     key = require('os').networkInterfaces().eth0[0]?.mac,
-    ttl = 86400 // Time to Live in seconds
+    ttl = 86400 // Time to Live in seconds (Natural number)
   }: {
     algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
     key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
@@ -78,6 +79,7 @@ ttl(param?: number = 86400): void
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid remoteAddress
+ * @throws {SyntaxError} Invalid remoteAddress
  * @throws {TypeError} Invalid ttl
  */
 signCookie(
@@ -90,12 +92,12 @@ signCookie(
     remoteAddress = '',
     ttl = 86400
   }: {
-    algorithm?: string,
-    ttl?: number,
-    remoteAddress?: string, // https://developer.mozilla.org/en-US/docs/Glossary/IP_Address
-    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
     accessControlAllowMethods?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
-    nonce?: string // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
+    algorithm?: string,
+    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey,
+    nonce?: string, // https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes
+    remoteAddress?: string, // https://developer.mozilla.org/en-US/docs/Glossary/IP_Address
+    ttl?: number
   }
 ): string // Cookie signed
 
@@ -107,6 +109,7 @@ signCookie(
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
+ * @throws {SyntaxError} Invalid remoteAddress
  * @throws {SyntaxError} method required
  * @throws {SyntaxError} remoteAddress required
  */
@@ -135,6 +138,7 @@ verifyCookie(
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid pathname
  * @throws {TypeError} Invalid remoteAddress
+ * @throws {SyntaxError} Invalid remoteAddress
  * @throws {TypeError} Invalid ttl
  */
 signURL(
@@ -165,6 +169,7 @@ signURL(
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
+ * @throws {SyntaxError} Invalid remoteAddress
  * @throws {SyntaxError} method required
  * @throws {SyntaxError} remoteAddress required
  */
