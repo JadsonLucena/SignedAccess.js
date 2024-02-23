@@ -13,7 +13,7 @@ const signedAccess = new SignedAccess({
 describe('constructor', () => {
   test('type guards', () => {
     ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input, key })).toThrowError(new TypeError('Invalid algorithm')));
-    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input, key })).toThrowError(new TypeError('Invalid ttl')));
+    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input, key })).toThrow('Invalid ttl'));
     [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrowError(new TypeError('Invalid key')))
   })
 
@@ -54,13 +54,12 @@ describe('signURL', () => {
   test('type guards', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signURL(input)).toThrowError(new TypeError('Invalid URL')));
     ['xpto', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
-    ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ttl: input })).toThrowError(new TypeError('Invalid ttl')));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { remoteAddress: input })).toThrowError(new TypeError('Invalid remoteAddress')));
-    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads'].forEach(input => expect(() => signedAccess.signURL(url, { remoteAddress: input })).toThrowError(new SyntaxError('Invalid remoteAddress')));
+    ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { ttl: input })).toThrow('Invalid ttl'));
+    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { key: input })).toThrowError(new TypeError('Invalid key')));
-    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { accessControlAllowMethods: input })).toThrowError(new TypeError('Invalid accessControlAllowMethods')));
+    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrowError(new TypeError('Invalid nonce')));
-    ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrowError(new TypeError('Invalid pathname')))
+    ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrow('Invalid pathname'))
   })
 
   test('default values', () => {
@@ -140,8 +139,7 @@ describe('verifyURL', () => {
 
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(input)).toThrowError(new TypeError('Invalid URL')));
     ['xpto', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { remoteAddress: input })).toThrowError(new TypeError('Invalid remoteAddress')));
-    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads'].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { remoteAddress: input })).toThrowError(new SyntaxError('Invalid remoteAddress')));
+    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { key: input })).toThrowError(new TypeError('Invalid key')));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { method: input })).toThrowError(new TypeError('Invalid method')))
   })
@@ -164,7 +162,7 @@ describe('verifyURL', () => {
 
     signedURL = signedAccess.signURL(url, { remoteAddress: '127.0.0.1' })
 
-    expect(() => signedAccess.verifyURL(signedURL)).toThrowError(new SyntaxError('remoteAddress required'))
+    expect(() => signedAccess.verifyURL(signedURL)).toThrowError(new Error('remoteAddress required'))
     expect(signedAccess.verifyURL(signedURL, { remoteAddress: '142.251.129.78' })).toBeFalsy()
     expect(signedAccess.verifyURL(signedURL, { remoteAddress: '127.0.0.1' })).toBeTruthy()
 
@@ -175,7 +173,7 @@ describe('verifyURL', () => {
 
     signedURL = signedAccess.signURL(url, { accessControlAllowMethods: 'POST' })
 
-    expect(() => signedAccess.verifyURL(signedURL)).toThrowError(new SyntaxError('method required'))
+    expect(() => signedAccess.verifyURL(signedURL)).toThrowError(new Error('method required'))
     expect(signedAccess.verifyURL(signedURL, { method: 'PATCH' })).toBeFalsy()
     expect(signedAccess.verifyURL(signedURL, { method: 'POST' })).toBeTruthy()
 
@@ -212,8 +210,8 @@ describe('verifyURL', () => {
 
     mockSignedURL = `https://github.com/JadsonLucena/WebSocket.js?${new URL(signedURL).searchParams.toString()}`
 
-    expect(() => signedAccess.verifyURL(mockSignedURL, { method: 'POST' })).toThrowError(new SyntaxError('remoteAddress required'))
-    expect(() => signedAccess.verifyURL(mockSignedURL, { remoteAddress: '142.251.129.78' })).toThrowError(new SyntaxError('method required'))
+    expect(() => signedAccess.verifyURL(mockSignedURL, { method: 'POST' })).toThrowError(new Error('remoteAddress required'))
+    expect(() => signedAccess.verifyURL(mockSignedURL, { remoteAddress: '142.251.129.78' })).toThrowError(new Error('method required'))
     expect(signedAccess.verifyURL(mockSignedURL, {
       remoteAddress: '142.251.129.78',
       method: 'DELETE'
@@ -239,11 +237,10 @@ describe('signCookie', () => {
   test('type guards', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(input)).toThrowError(new TypeError('Invalid prefix')));
     ['xpto', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
-    ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ttl: input })).toThrowError(new TypeError('Invalid ttl')));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { remoteAddress: input })).toThrowError(new TypeError('Invalid remoteAddress')));
-    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads'].forEach(input => expect(() => signedAccess.signCookie(prefix, { remoteAddress: input })).toThrowError(new SyntaxError('Invalid remoteAddress')));
+    ['tomorrow', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { ttl: input })).toThrow('Invalid ttl'));
+    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrowError(new TypeError('Invalid key')));
-    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { accessControlAllowMethods: input })).toThrowError(new TypeError('Invalid accessControlAllowMethods')));
+    ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrowError(new TypeError('Invalid nonce')))
   })
 
@@ -304,8 +301,7 @@ describe('verifyCookie', () => {
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(input, signedCookie)).toThrowError(new TypeError('Invalid URL')));
     [undefined, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, input)).toThrowError(new TypeError('Invalid cookie')));
     ['xpto', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
-    [127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: input })).toThrowError(new TypeError('Invalid remoteAddress')));
-    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads'].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: input })).toThrowError(new SyntaxError('Invalid remoteAddress')));
+    ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { key: input })).toThrowError(new TypeError('Invalid key')));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: input })).toThrowError(new TypeError('Invalid method')))
   })
@@ -332,7 +328,7 @@ describe('verifyCookie', () => {
 
     signedCookie = signedAccess.signCookie(prefix, { remoteAddress: '127.0.0.1' })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrowError(new SyntaxError('remoteAddress required'))
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrowError(new Error('remoteAddress required'))
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '127.0.0.1' })).toBeTruthy()
 
@@ -343,7 +339,7 @@ describe('verifyCookie', () => {
 
     signedCookie = signedAccess.signCookie(prefix, { accessControlAllowMethods: 'POST' })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrowError(new SyntaxError('method required'))
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie)).toThrowError(new Error('method required'))
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { method: 'PATCH' })).toBeFalsy()
     expect(signedAccess.verifyCookie(mockURL, signedCookie, { method: 'POST' })).toBeTruthy()
 
@@ -363,8 +359,8 @@ describe('verifyCookie', () => {
       nonce: crypto.randomUUID()
     })
 
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: 'POST' })).toThrowError(new SyntaxError('remoteAddress required'))
-    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toThrowError(new SyntaxError('method required'))
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: 'POST' })).toThrowError(new Error('remoteAddress required'))
+    expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: '142.251.129.78' })).toThrowError(new Error('method required'))
     expect(signedAccess.verifyCookie(mockURL, signedCookie, {
       remoteAddress: '142.251.129.78',
       method: 'DELETE'
