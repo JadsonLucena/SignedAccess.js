@@ -1,7 +1,6 @@
 'use strict'
 
 const crypto = require('node:crypto')
-const os = require('node:os')
 const net = require('node:net')
 
 /**
@@ -9,7 +8,7 @@ const net = require('node:net')
  * @classdesc Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes
  *
  * @typedef {(Int8Array|Uint8Array|Uint8ClampedArray|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array|BigInt64Array|BigUint64Array)} TypedArray
- * @typedef {(string|ArrayBuffer|TypedArray|DataView|Buffer|KeyObject|CryptoKey)} key
+ * @typedef {(string|ArrayBuffer|TypedArray|DataView|Buffer|KeyObject|CryptoKey)} Key
  */
 class SignedAccess {
   #algorithm
@@ -23,7 +22,7 @@ class SignedAccess {
    * @constructor
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
    *
    * @throws {TypeError} Invalid algorithm
@@ -34,7 +33,7 @@ class SignedAccess {
     algorithm,
     key,
     ttl
-  } = {}) {
+  }) {
     this.algorithm = algorithm
     this.key = key
     this.ttl = ttl
@@ -49,7 +48,7 @@ class SignedAccess {
   get algorithm () { return this.#algorithm }
   /**
    * @getter
-   * @return {key}
+   * @return {Key}
    */
   get key () { return this.#key }
   /**
@@ -76,13 +75,10 @@ class SignedAccess {
 
   /**
    * @setter
-   * @type {key}
-   * @default require('os').networkInterfaces().eth0[0]?.mac
+   * @type {Key}
    * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
    */
-  set key (
-    key = os.networkInterfaces().eth0[0]?.mac
-  ) {
+  set key (key) {
     try {
       crypto.createHmac('sha1', key)
     } catch (err) {
@@ -148,7 +144,7 @@ class SignedAccess {
    * @param {Object} [options]
    * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.pathname] - Starts with / followed by the {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname URL path}, shouldn't include query parameters or fragments such as ? or #
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
@@ -223,7 +219,7 @@ class SignedAccess {
    * @param {string} url - Signed {@link https://nodejs.org/api/url.html#url-strings-and-url-objects URL}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    *
@@ -300,7 +296,7 @@ class SignedAccess {
    * @param {Object} [options]
    * @param {string} [options.accessControlAllowMethods=*] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods Access control allow methods}
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
@@ -360,7 +356,7 @@ class SignedAccess {
    * @param {string} cookie - Signed {@link https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Cookies cookie}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {key} [options.key=require('os').networkInterfaces().eth0[0]?.mac] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
+   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    *

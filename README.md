@@ -32,11 +32,11 @@ The subscription ensures that the permissions for a particular resource are not 
 SignedAccess(
   {
     algorithm = 'sha512',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
+    key,
     ttl = 86400 // Time to Live in seconds (Natural number)
   }: {
     algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
-    key?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
+    key: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
     ttl?: number // https://wikipedia.org/wiki/Time_to_live
   }
 )
@@ -61,7 +61,7 @@ algorithm(param?: string = 'sha512'): void
  * @throws {TypeError} Invalid key
  * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
  */
-key(param?: (string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey) = require('os').networkInterfaces().eth0[0]?.mac): void
+key(param?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey): void
 
 /**
  * @throws {TypeError} Invalid ttl
@@ -86,11 +86,11 @@ signCookie(
   prefix: string, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
   {
     accessControlAllowMethods = '*',
-    algorithm = 'sha512',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
+    algorithm = this.algorithm,
+    key = this.key,
     nonce = '',
     remoteAddress = '',
-    ttl = 86400
+    ttl = this.ttl
   }: {
     accessControlAllowMethods?: string, // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     algorithm?: string,
@@ -117,8 +117,8 @@ verifyCookie(
   url: string,
   cookie: string,
   {
-    algorithm = 'sha512',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
+    algorithm = this.algorithm,
+    key = this.key,
     method = '', // will be required if it has been added to the signature
     remoteAddress = '' // will be required if it has been added to the signature
   }: {
@@ -145,12 +145,12 @@ signURL(
   url: string,
   {
     accessControlAllowMethods = '*',
-    algorithm = 'sha512',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
+    algorithm = this.algorithm,
+    key = this.key,
     nonce = '',
     pathname = '', // Must be a valid path contained in the url
     remoteAddress = '',
-    ttl = 86400
+    ttl = this.ttl
   }: {
     accessControlAllowMethods?: string,
     algorithm?: string,
@@ -176,8 +176,8 @@ signURL(
 verifyURL(
   url: string,
   {
-    algorithm = 'sha512',
-    key = require('os').networkInterfaces().eth0[0]?.mac,
+    algorithm = this.algorithm,
+    key = this.key,
     method = '',
     remoteAddress = ''
   }: {
