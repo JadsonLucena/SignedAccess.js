@@ -4,21 +4,27 @@ const crypto = require('node:crypto')
 
 const SignedAccess = require('../src/SignedAccess.js')
 
-const signedAccess = new SignedAccess()
+const key = '9x,9Ku9TrUL'
+
+const signedAccess = new SignedAccess({
+  key
+})
 
 describe('constructor', () => {
   test('type guards', () => {
-    ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
-    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input })).toThrowError(new TypeError('Invalid ttl')));
+    ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input, key })).toThrowError(new TypeError('Invalid algorithm')));
+    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input, key })).toThrowError(new TypeError('Invalid ttl')));
     [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrowError(new TypeError('Invalid key')))
   })
 
   test('default values', () => {
-    const signedAccess = new SignedAccess()
+    const signedAccess = new SignedAccess({
+      key
+    })
 
     expect(signedAccess.algorithm).toBe('sha512')
     expect(signedAccess.ttl).toBe(86400)
-    expect(signedAccess.key).toBe(require('os').networkInterfaces().eth0[0].mac)
+    expect(signedAccess.key).toBe(key)
   })
 
   test('custom values', () => {
