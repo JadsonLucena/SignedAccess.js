@@ -65,6 +65,7 @@ key(param?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | 
 
 /**
  * @throws {TypeError} Invalid ttl
+ * @throws {SyntaxError} Invalid ttl
  * @see https://wikipedia.org/wiki/Time_to_live
  */
 ttl(param?: number = 86400): void
@@ -75,12 +76,14 @@ ttl(param?: number = 86400): void
  * @method
  * @throws {TypeError} Invalid prefix
  * @throws {TypeError} Invalid accessControlAllowMethods
+ * @throws {SyntaxError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid remoteAddress
  * @throws {SyntaxError} Invalid remoteAddress
  * @throws {TypeError} Invalid ttl
+ * @throws {SyntaxError} Invalid ttl
  */
 signCookie(
   prefix: string, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
@@ -110,8 +113,8 @@ signCookie(
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
  * @throws {SyntaxError} Invalid remoteAddress
- * @throws {SyntaxError} method required
- * @throws {SyntaxError} remoteAddress required
+ * @throws {Error} method required
+ * @throws {Error} remoteAddress required
  */
 verifyCookie(
   url: string,
@@ -132,14 +135,17 @@ verifyCookie(
 /**
  * @method
  * @throws {TypeError} Invalid url
- * @throws {TypeError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid algorithm
+ * @throws {TypeError} Invalid accessControlAllowMethods
+ * @throws {SyntaxError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
  * @throws {TypeError} Invalid pathname
+ * @throws {SyntaxError} Invalid pathname
  * @throws {TypeError} Invalid remoteAddress
  * @throws {SyntaxError} Invalid remoteAddress
  * @throws {TypeError} Invalid ttl
+ * @throws {SyntaxError} Invalid ttl
  */
 signURL(
   url: string,
@@ -170,8 +176,8 @@ signURL(
  * @throws {TypeError} Invalid method
  * @throws {TypeError} Invalid remoteAddress
  * @throws {SyntaxError} Invalid remoteAddress
- * @throws {SyntaxError} method required
- * @throws {SyntaxError} remoteAddress required
+ * @throws {Error} method required
+ * @throws {Error} remoteAddress required
  */
 verifyURL(
   url: string,

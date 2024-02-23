@@ -42,25 +42,11 @@ class SignedAccess {
   }
 
   /**
-   * @getter
-   * @return {string}
-   */
-  get algorithm () { return this.#algorithm }
-  /**
-   * @getter
-   * @return {Key}
-   */
-  get key () { return this.#key }
-  /**
-   * @getter
-   * @return {number}
-   */
-  get ttl () { return this.#ttl }
-
-  /**
-   * @setter
    * @type {string}
    * @default 'sha512'
+   *
+   * @throws {TypeError} Invalid algorithm
+   *
    * @see https://nodejs.org/api/crypto.html#cryptogethashes
    */
   set algorithm (
@@ -74,8 +60,15 @@ class SignedAccess {
   }
 
   /**
-   * @setter
+   * @return {string}
+   */
+  get algorithm () { return this.#algorithm }
+
+  /**
    * @type {Key}
+   *
+   * @throws {TypeError} Invalid key
+   *
    * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
    */
   set key (key) {
@@ -89,21 +82,36 @@ class SignedAccess {
   }
 
   /**
+   * @return {Key}
+   */
+  get key () { return this.#key }
+
+  /**
    * Time to Live in seconds
-   * @setter
    * @type {number}
    * @default 86400
+   *
+   * @throws {TypeError} Invalid ttl
+   * @throws {SyntaxError} Invalid ttl
+   *
    * @see https://wikipedia.org/wiki/Time_to_live
    */
   set ttl (
     ttl = 86400 // Seconds
   ) {
-    if (!Number.isSafeInteger(ttl) || ttl < 1) {
+    if (!Number.isSafeInteger(ttl)) {
       throw new TypeError('Invalid ttl')
+    } else if (ttl < 1) {
+      throw new SyntaxError('Invalid ttl')
     }
 
     this.#ttl = ttl
   }
+
+  /**
+   * @return {number}
+   */
+  get ttl () { return this.#ttl }
 
   #encodePrefix (prefix) {
     prefix = new URL(prefix)
@@ -153,12 +161,15 @@ class SignedAccess {
    * @throws {TypeError} Invalid url
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid accessControlAllowMethods
+   * @throws {SyntaxError} Invalid accessControlAllowMethods
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid nonce
    * @throws {TypeError} Invalid pathname
+   * @throws {SyntaxError} Invalid pathname
    * @throws {TypeError} Invalid remoteAddress
    * @throws {SyntaxError} Invalid remoteAddress
    * @throws {TypeError} Invalid ttl
+   * @throws {SyntaxError} Invalid ttl
    *
    * @return {string} Signed URL
    */
@@ -176,18 +187,24 @@ class SignedAccess {
   ) {
     url = new URL(url)
 
-    if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+    if (typeof accessControlAllowMethods !== 'string') {
       throw new TypeError('Invalid accessControlAllowMethods')
+    } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+      throw new SyntaxError('Invalid accessControlAllowMethods')
     } else if (typeof nonce !== 'string') {
       throw new TypeError('Invalid nonce')
-    } else if (typeof pathname !== 'string' || !decodeURIComponent(url.pathname).startsWith(pathname)) {
+    } else if (typeof pathname !== 'string') {
       throw new TypeError('Invalid pathname')
+    } else if (pathname && !decodeURIComponent(url.pathname).startsWith(pathname)) {
+      throw new SyntaxError('Invalid pathname')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       throw new SyntaxError('Invalid remoteAddress')
-    } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
+    } else if (!Number.isSafeInteger(ttl)) {
       throw new TypeError('Invalid ttl')
+    } else if (ttl < 1) {
+      throw new SyntaxError('Invalid ttl')
     }
 
     url.searchParams.delete('expires')
@@ -254,9 +271,9 @@ class SignedAccess {
     }
 
     if (url.searchParams.has('method') && !method.trim()) {
-      throw new SyntaxError('method required')
+      throw new Error('method required')
     } else if (url.searchParams.has('ip') && !remoteAddress.trim()) {
-      throw new SyntaxError('remoteAddress required')
+      throw new Error('remoteAddress required')
     }
 
     const signature = url.searchParams.get('signature')
@@ -303,12 +320,14 @@ class SignedAccess {
    *
    * @throws {TypeError} Invalid prefix
    * @throws {TypeError} Invalid accessControlAllowMethods
+   * @throws {SyntaxError} Invalid accessControlAllowMethods
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid nonce
    * @throws {TypeError} Invalid remoteAddress
    * @throws {SyntaxError} Invalid remoteAddress
    * @throws {TypeError} Invalid ttl
+   * @throws {SyntaxError} Invalid ttl
    *
    * @return {string} Signed cookie
    */
@@ -325,16 +344,20 @@ class SignedAccess {
   ) {
     if (typeof prefix !== 'string') {
       throw new TypeError('Invalid prefix')
-    } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+    } else if (typeof accessControlAllowMethods !== 'string') {
       throw new TypeError('Invalid accessControlAllowMethods')
+    } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
+      throw new SyntaxError('Invalid accessControlAllowMethods')
     } else if (typeof nonce !== 'string') {
       throw new TypeError('Invalid nonce')
     } else if (typeof remoteAddress !== 'string') {
       throw new TypeError('Invalid remoteAddress')
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       throw new SyntaxError('Invalid remoteAddress')
-    } else if (!Number.isSafeInteger(ttl) || ttl < 1) {
+    } else if (!Number.isSafeInteger(ttl)) {
       throw new TypeError('Invalid ttl')
+    } else if (ttl < 1) {
+      throw new SyntaxError('Invalid ttl')
     }
 
     const cookie = new URLSearchParams()
@@ -396,9 +419,9 @@ class SignedAccess {
     }
 
     if (cookie.has('method') && !method.trim()) {
-      throw new SyntaxError('method required')
+      throw new Error('method required')
     } else if (cookie.has('ip') && !remoteAddress.trim()) {
-      throw new SyntaxError('remoteAddress required')
+      throw new Error('remoteAddress required')
     }
 
     const signature = cookie.get('signature')
