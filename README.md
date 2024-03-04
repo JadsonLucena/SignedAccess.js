@@ -27,7 +27,8 @@ The subscription ensures that the permissions for a particular resource are not 
  * @constructor
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
- * @throws {TypeError} Invalid ttl
+ * @throws {TypeError|SyntaxError} Invalid ttl
+ * @throws {AggregateError} Invalid arguments
  */
 SignedAccess(
   {
@@ -64,8 +65,7 @@ algorithm(param?: string = 'sha512'): void
 key(param?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey): void
 
 /**
- * @throws {TypeError} Invalid ttl
- * @throws {SyntaxError} Invalid ttl
+ * @throws {TypeError|SyntaxError} Invalid ttl
  * @see https://wikipedia.org/wiki/Time_to_live
  */
 ttl(param?: number = 86400): void
@@ -75,15 +75,13 @@ ttl(param?: number = 86400): void
 /**
  * @method
  * @throws {TypeError} Invalid prefix
- * @throws {TypeError} Invalid accessControlAllowMethods
- * @throws {SyntaxError} Invalid accessControlAllowMethods
+ * @throws {TypeError|SyntaxError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
- * @throws {TypeError} Invalid remoteAddress
- * @throws {SyntaxError} Invalid remoteAddress
- * @throws {TypeError} Invalid ttl
- * @throws {SyntaxError} Invalid ttl
+ * @throws {TypeError|SyntaxError} Invalid remoteAddress
+ * @throws {TypeError|SyntaxError} Invalid ttl
+ * @throws {AggregateError} Invalid arguments
  */
 signCookie(
   prefix: string, // A prefix encodes a scheme (either http:// or https://), FQDN, and an optional path. Ending the path with a / is optional but recommended. The prefix shouldn't include query parameters or fragments such as ? or #.
@@ -111,10 +109,10 @@ signCookie(
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
- * @throws {TypeError} Invalid remoteAddress
- * @throws {SyntaxError} Invalid remoteAddress
+ * @throws {TypeError|SyntaxError} Invalid remoteAddress
  * @throws {Error} method required
  * @throws {Error} remoteAddress required
+ * @throws {AggregateError} Invalid arguments
  */
 verifyCookie(
   url: string,
@@ -136,16 +134,13 @@ verifyCookie(
  * @method
  * @throws {TypeError} Invalid url
  * @throws {TypeError} Invalid algorithm
- * @throws {TypeError} Invalid accessControlAllowMethods
- * @throws {SyntaxError} Invalid accessControlAllowMethods
+ * @throws {TypeError|SyntaxError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid nonce
- * @throws {TypeError} Invalid pathname
- * @throws {SyntaxError} Invalid pathname
- * @throws {TypeError} Invalid remoteAddress
- * @throws {SyntaxError} Invalid remoteAddress
- * @throws {TypeError} Invalid ttl
- * @throws {SyntaxError} Invalid ttl
+ * @throws {TypeError|SyntaxError} Invalid pathname
+ * @throws {TypeError|SyntaxError} Invalid remoteAddress
+ * @throws {TypeError|SyntaxError} Invalid ttl
+ * @throws {AggregateError} Invalid arguments
  */
 signURL(
   url: string,
@@ -174,10 +169,10 @@ signURL(
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
- * @throws {TypeError} Invalid remoteAddress
- * @throws {SyntaxError} Invalid remoteAddress
+ * @throws {TypeError|SyntaxError} Invalid remoteAddress
  * @throws {Error} method required
  * @throws {Error} remoteAddress required
+ * @throws {AggregateError} Invalid arguments
  */
 verifyURL(
   url: string,
