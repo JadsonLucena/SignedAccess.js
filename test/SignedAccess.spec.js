@@ -6,21 +6,17 @@ const SignedAccess = require('../src/SignedAccess.js')
 
 const key = '9x,9Ku9TrUL'
 
-const signedAccess = new SignedAccess({
-  key
-})
+const signedAccess = new SignedAccess(key)
 
 describe('constructor', () => {
   test('type guards', () => {
-    ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess({ algorithm: input, key })).toThrowError(new TypeError('Invalid algorithm')));
-    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess({ ttl: input, key })).toThrow('Invalid ttl'));
-    [0, false, null].forEach(input => expect(() => new SignedAccess({ key: input })).toThrowError(new TypeError('Invalid key')))
+    ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess(key, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
+    ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess(key, { ttl: input })).toThrow('Invalid ttl'));
+    [0, false, null].forEach(input => expect(() => new SignedAccess(input)).toThrowError(new TypeError('Invalid key')))
   })
 
   test('default values', () => {
-    const signedAccess = new SignedAccess({
-      key
-    })
+    const signedAccess = new SignedAccess(key)
 
     expect(signedAccess.algorithm).toBe('sha512')
     expect(signedAccess.ttl).toBe(86400)
@@ -28,10 +24,9 @@ describe('constructor', () => {
   })
 
   test('custom values', () => {
-    const signedAccess = new SignedAccess({
+    const signedAccess = new SignedAccess('xpto', {
       algorithm: 'md5',
-      ttl: 1,
-      key: 'xpto'
+      ttl: 1
     })
 
     expect(signedAccess.algorithm).toBe('md5')

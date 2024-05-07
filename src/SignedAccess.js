@@ -11,8 +11,8 @@ const net = require('node:net')
  * @typedef {(string|ArrayBuffer|TypedArray|DataView|Buffer|KeyObject|CryptoKey)} Key
  */
 class SignedAccess {
-  #algorithm
   #key
+  #algorithm
   #ttl
 
   #HTTPMethods
@@ -20,30 +20,29 @@ class SignedAccess {
   /**
    * Create a Signed Access
    * @constructor
+   * @param {Key} key - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
    *
-   * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid key
+   * @throws {TypeError} Invalid algorithm
    * @throws {TypeError|SyntaxError} Invalid ttl
    * @throws {AggregateError} Invalid arguments
    */
-  constructor ({
+  constructor (key, {
     algorithm,
-    key,
     ttl
-  }) {
+  } = {}) {
     const errors = []
     try {
-      this.algorithm = algorithm
+      this.key = key
     } catch (err) {
       errors.push(err)
     }
 
     try {
-      this.key = key
+      this.algorithm = algorithm
     } catch (err) {
       errors.push(err)
     }
