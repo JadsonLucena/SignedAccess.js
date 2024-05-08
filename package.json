@@ -1,6 +1,6 @@
 {
   "name": "@jadsonlucena/signedaccess",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
   "main": "./src/SignedAccess.js",
   "engines": {
