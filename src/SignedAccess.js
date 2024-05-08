@@ -35,6 +35,7 @@ class SignedAccess {
     ttl
   } = {}) {
     const errors = []
+
     try {
       this.key = key
     } catch (err) {
@@ -178,7 +179,7 @@ class SignedAccess {
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
    *
-   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid URL
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError|SyntaxError} Invalid accessControlAllowMethods
    * @throws {TypeError} Invalid key
@@ -202,25 +203,33 @@ class SignedAccess {
       ttl = this.#ttl
     } = {}
   ) {
-    url = new URL(url)
-
     const errors = []
+
+    try {
+      url = new URL(url)
+    } catch (err) {
+      errors.push(new TypeError('Invalid URL'))
+    }
 
     if (typeof accessControlAllowMethods !== 'string') {
       errors.push(new TypeError('Invalid accessControlAllowMethods'))
     } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
       errors.push(new SyntaxError('Invalid accessControlAllowMethods'))
-    } else if (typeof nonce !== 'string') {
+    }
+    if (typeof nonce !== 'string') {
       errors.push(new TypeError('Invalid nonce'))
-    } else if (typeof pathname !== 'string') {
+    }
+    if (typeof pathname !== 'string') {
       errors.push(new TypeError('Invalid pathname'))
     } else if (pathname && !decodeURIComponent(url.pathname).startsWith(pathname)) {
       errors.push(new SyntaxError('Invalid pathname'))
-    } else if (typeof remoteAddress !== 'string') {
+    }
+    if (typeof remoteAddress !== 'string') {
       errors.push(new TypeError('Invalid remoteAddress'))
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       errors.push(new SyntaxError('Invalid remoteAddress'))
-    } else if (!Number.isSafeInteger(ttl)) {
+    }
+    if (!Number.isSafeInteger(ttl)) {
       errors.push(new TypeError('Invalid ttl'))
     } else if (ttl < 1) {
       errors.push(new SyntaxError('Invalid ttl'))
@@ -265,14 +274,15 @@ class SignedAccess {
    * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    *
-   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid URL
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {TypeError|SyntaxError} Invalid remoteAddress
+   * @throws {AggregateError} Invalid arguments
    * @throws {Error} method required
    * @throws {Error} remoteAddress required
-   * @throws {AggregateError} Invalid arguments
+   * @throws {AggregateError} Invalid URL
    *
    * @return {boolean}
    */
@@ -285,13 +295,18 @@ class SignedAccess {
       remoteAddress = ''
     } = {}
   ) {
-    url = new URL(url)
-
     const errors = []
+
+    try {
+      url = new URL(url)
+    } catch (err) {
+      errors.push(new TypeError('Invalid URL'))
+    }
 
     if (typeof method !== 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
       errors.push(new TypeError('Invalid method'))
-    } else if (typeof remoteAddress !== 'string') {
+    }
+    if (typeof remoteAddress !== 'string') {
       errors.push(new TypeError('Invalid remoteAddress'))
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       errors.push(new SyntaxError('Invalid remoteAddress'))
@@ -305,12 +320,13 @@ class SignedAccess {
 
     if (url.searchParams.has('method') && !method.trim()) {
       errors.push(new Error('method required'))
-    } else if (url.searchParams.has('ip') && !remoteAddress.trim()) {
+    }
+    if (url.searchParams.has('ip') && !remoteAddress.trim()) {
       errors.push(new Error('remoteAddress required'))
     }
 
     if (errors.length > 1) {
-      throw new AggregateError(errors, 'Invalid url')
+      throw new AggregateError(errors, 'Invalid URL')
     } else if (errors.length === 1) {
       throw errors.pop()
     }
@@ -383,17 +399,21 @@ class SignedAccess {
 
     if (typeof prefix !== 'string') {
       errors.push(new TypeError('Invalid prefix'))
-    } else if (typeof accessControlAllowMethods !== 'string') {
+    }
+    if (typeof accessControlAllowMethods !== 'string') {
       errors.push(new TypeError('Invalid accessControlAllowMethods'))
     } else if (!new RegExp(`^\\s*(\\*|(${this.#HTTPMethods.join('|')})(\\s*,\\s*(${this.#HTTPMethods.join('|')}))*)\\s*$`, 'i').test(accessControlAllowMethods)) {
       errors.push(new SyntaxError('Invalid accessControlAllowMethods'))
-    } else if (typeof nonce !== 'string') {
+    }
+    if (typeof nonce !== 'string') {
       errors.push(new TypeError('Invalid nonce'))
-    } else if (typeof remoteAddress !== 'string') {
+    }
+    if (typeof remoteAddress !== 'string') {
       errors.push(new TypeError('Invalid remoteAddress'))
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       errors.push(new SyntaxError('Invalid remoteAddress'))
-    } else if (!Number.isSafeInteger(ttl)) {
+    }
+    if (!Number.isSafeInteger(ttl)) {
       errors.push(new TypeError('Invalid ttl'))
     } else if (ttl < 1) {
       errors.push(new SyntaxError('Invalid ttl'))
@@ -428,15 +448,16 @@ class SignedAccess {
    * @param {string} [options.method] - {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods HTTP request methods}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
    *
-   * @throws {TypeError} Invalid url
+   * @throws {TypeError} Invalid URL
    * @throws {TypeError} Invalid cookie
    * @throws {TypeError} Invalid algorithm
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid method
    * @throws {TypeError|SyntaxError} Invalid remoteAddress
+   * @throws {AggregateError} Invalid arguments
    * @throws {Error} method required
    * @throws {Error} remoteAddress required
-   * @throws {AggregateError} Invalid arguments
+   * @throws {AggregateError} Invalid cookie
    *
    * @return {boolean}
    */
@@ -450,16 +471,23 @@ class SignedAccess {
       remoteAddress = ''
     } = {}
   ) {
-    cookie = new URLSearchParams(cookie)
-    url = new URL(url)
-
     const errors = []
+
+    try {
+      url = new URL(url)
+    } catch (err) {
+      errors.push(new TypeError('Invalid URL'))
+    }
+
+    cookie = new URLSearchParams(cookie)
 
     if (!cookie.has('prefix') || !cookie.has('expires') || !cookie.has('signature')) {
       errors.push(new TypeError('Invalid cookie'))
-    } else if (typeof method !== 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
+    }
+    if (typeof method !== 'string' || !['', ...this.#HTTPMethods].includes(method.trim().toUpperCase())) {
       errors.push(new TypeError('Invalid method'))
-    } else if (typeof remoteAddress !== 'string') {
+    }
+    if (typeof remoteAddress !== 'string') {
       errors.push(new TypeError('Invalid remoteAddress'))
     } else if (remoteAddress && net.isIP(remoteAddress) === 0) {
       errors.push(new SyntaxError('Invalid remoteAddress'))
@@ -473,7 +501,8 @@ class SignedAccess {
 
     if (cookie.has('method') && !method.trim()) {
       errors.push(new Error('method required'))
-    } else if (cookie.has('ip') && !remoteAddress.trim()) {
+    }
+    if (cookie.has('ip') && !remoteAddress.trim()) {
       errors.push(new Error('remoteAddress required'))
     }
 

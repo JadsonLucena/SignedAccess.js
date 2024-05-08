@@ -24,6 +24,7 @@
     "signed-url",
     "signed-cookie",
     "signed-requests",
+    "presigned-url",
     "access-control",
     "access-integrity",
     "access-token",

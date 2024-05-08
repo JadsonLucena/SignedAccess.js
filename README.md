@@ -1,7 +1,7 @@
 # SignedAccess
 [![CodeQL](https://github.com/JadsonLucena/SignedAccess.js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions/workflows/github-code-scanning/codeql)
-[![Test Pass](https://github.com/JadsonLucena/SignedAccess.js/workflows/test/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions?workflow=test)
-[![Coverage Status](https://coveralls.io/repos/github/JadsonLucena/SignedAccess.js/badge.svg)](https://coveralls.io/github/JadsonLucena/SignedAccess.js)
+[![Test](https://github.com/JadsonLucena/SignedAccess.js/workflows/test/badge.svg)](https://github.com/JadsonLucena/SignedAccess.js/actions?workflow=test)
+[![Coverage](https://coveralls.io/repos/github/JadsonLucena/SignedAccess.js/badge.svg)](https://coveralls.io/github/JadsonLucena/SignedAccess.js)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
@@ -25,50 +25,44 @@ The subscription ensures that the permissions for a particular resource are not 
 ```typescript
 /**
  * @constructor
- * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
+ * @throws {TypeError} Invalid algorithm
  * @throws {TypeError|SyntaxError} Invalid ttl
  * @throws {AggregateError} Invalid arguments
  */
 SignedAccess(
+  key: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
   {
     algorithm = 'sha512',
-    key,
     ttl = 86400 // Time to Live in seconds (Natural number)
   }: {
     algorithm?: string, // https://nodejs.org/api/crypto.html#cryptogethashes
-    key: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey, // https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
     ttl?: number // https://wikipedia.org/wiki/Time_to_live
   }
 )
 ```
 
 ```typescript
-// Getters
-algorithm(): string
-key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
-ttl(): number
-```
-
-```typescript
-// Setters
 /**
  * @throws {TypeError} Invalid algorithm
  * @see https://nodejs.org/api/crypto.html#cryptogethashes
  */
-algorithm(param?: string = 'sha512'): void
+set algorithm(param?: string = 'sha512')
+get algorithm(): string
 
 /**
  * @throws {TypeError} Invalid key
  * @see https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options
  */
-key(param?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey): void
+set key(param?: string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey)
+get key(): string | ArrayBuffer | Buffer | TypedArray | DataView | KeyObject | CryptoKey
 
 /**
  * @throws {TypeError|SyntaxError} Invalid ttl
  * @see https://wikipedia.org/wiki/Time_to_live
  */
-ttl(param?: number = 86400): void
+set ttl(param?: number = 86400)
+get ttl(): number
 ```
 
 ```typescript
@@ -104,15 +98,16 @@ signCookie(
 
 /**
  * @method
- * @throws {TypeError} Invalid url
+ * @throws {TypeError} Invalid URL
  * @throws {TypeError} Invalid cookie
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError|SyntaxError} Invalid remoteAddress
+ * @throws {AggregateError} Invalid arguments
  * @throws {Error} method required
  * @throws {Error} remoteAddress required
- * @throws {AggregateError} Invalid arguments
+ * @throws {AggregateError} Invalid cookie
  */
 verifyCookie(
   url: string,
@@ -132,7 +127,7 @@ verifyCookie(
 
 /**
  * @method
- * @throws {TypeError} Invalid url
+ * @throws {TypeError} Invalid URL
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError|SyntaxError} Invalid accessControlAllowMethods
  * @throws {TypeError} Invalid key
@@ -165,14 +160,15 @@ signURL(
 
 /**
  * @method
- * @throws {TypeError} Invalid url
+ * @throws {TypeError} Invalid URL
  * @throws {TypeError} Invalid algorithm
  * @throws {TypeError} Invalid key
  * @throws {TypeError} Invalid method
  * @throws {TypeError|SyntaxError} Invalid remoteAddress
+ * @throws {AggregateError} Invalid arguments
  * @throws {Error} method required
  * @throws {Error} remoteAddress required
- * @throws {AggregateError} Invalid arguments
+ * @throws {AggregateError} Invalid URL
  */
 verifyURL(
   url: string,

@@ -12,7 +12,16 @@ describe('constructor', () => {
   test('type guards', () => {
     ['xpto', 0, false, null].forEach(input => expect(() => new SignedAccess(key, { algorithm: input })).toThrowError(new TypeError('Invalid algorithm')));
     ['xpto', '', 0, Infinity, NaN, false, null].forEach(input => expect(() => new SignedAccess(key, { ttl: input })).toThrow('Invalid ttl'));
-    [0, false, null].forEach(input => expect(() => new SignedAccess(input)).toThrowError(new TypeError('Invalid key')))
+    [false, null, undefined].forEach(input => expect(() => new SignedAccess(input)).toThrowError(new TypeError('Invalid key')))
+
+    expect(() => new SignedAccess(undefined, {
+      algorithm: null,
+      ttl: null
+    })).toThrowError(new AggregateError([
+      new TypeError('Invalid key'),
+      new TypeError('Invalid algorithm'),
+      new Error('Invalid ttl')
+    ], 'Invalid arguments'))
   })
 
   test('default values', () => {
@@ -24,14 +33,14 @@ describe('constructor', () => {
   })
 
   test('custom values', () => {
-    const signedAccess = new SignedAccess('xpto', {
+    const signedAccess = new SignedAccess(key, {
       algorithm: 'md5',
       ttl: 1
     })
 
     expect(signedAccess.algorithm).toBe('md5')
     expect(signedAccess.ttl).toBe(1)
-    expect(signedAccess.key).toBe('xpto')
+    expect(signedAccess.key).toBe(key)
 
     signedAccess.algorithm = 'sha256'
     signedAccess.ttl = 3600
@@ -55,6 +64,24 @@ describe('signURL', () => {
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     [0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { nonce: input })).toThrowError(new TypeError('Invalid nonce')));
     ['/github/', 0, false, null].forEach(input => expect(() => signedAccess.signURL(url, { pathname: input })).toThrow('Invalid pathname'))
+
+    expect(() => signedAccess.signURL(undefined, {
+      accessControlAllowMethods: null,
+      algorithm: null,
+      key: null,
+      nonce: null,
+      pathname: null,
+      remoteAddress: null,
+      ttl: null
+    })).toThrowError(new AggregateError([
+      new TypeError('Invalid URL'),
+      new Error('Invalid accessControlAllowMethods'),
+      new TypeError('Invalid algorithm'),
+      new TypeError('Invalid nonce'),
+      new Error('Invalid pathname'),
+      new Error('Invalid remoteAddress'),
+      new Error('Invalid ttl')
+    ], 'Invalid arguments'))
   })
 
   test('default values', () => {
@@ -137,6 +164,25 @@ describe('verifyURL', () => {
     ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { key: input })).toThrowError(new TypeError('Invalid key')));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyURL(signedURL, { method: input })).toThrowError(new TypeError('Invalid method')))
+
+    expect(() => signedAccess.verifyURL(undefined, {
+      algorithm: null,
+      key: null,
+      method: null,
+      remoteAddress: null
+    })).toThrowError(new AggregateError([
+      new TypeError('Invalid URL'),
+      new TypeError('Invalid method'),
+      new Error('Invalid remoteAddress')
+    ], 'Invalid arguments'))
+
+    expect(() => signedAccess.verifyURL(signedAccess.signURL(url, {
+      accessControlAllowMethods: 'GET',
+      remoteAddress: '127.0.0.1'
+    }))).toThrowError(new AggregateError([
+      new Error('method required'),
+      new Error('remoteAddress required')
+    ], 'Invalid URL'))
   })
 
   test('default values', () => {
@@ -237,6 +283,22 @@ describe('signCookie', () => {
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { key: input })).toThrowError(new TypeError('Invalid key')));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { accessControlAllowMethods: input })).toThrow('Invalid accessControlAllowMethods'));
     [0, false, null].forEach(input => expect(() => signedAccess.signCookie(prefix, { nonce: input })).toThrowError(new TypeError('Invalid nonce')))
+
+    expect(() => signedAccess.signCookie(prefix, {
+      accessControlAllowMethods: null,
+      algorithm: null,
+      key: null,
+      nonce: null,
+      remoteAddress: null,
+      ttl: null
+    })).toThrowError(new AggregateError([
+      new TypeError('Invalid prefix'),
+      new Error('Invalid accessControlAllowMethods'),
+      new TypeError('Invalid algorithm'),
+      new TypeError('Invalid nonce'),
+      new Error('Invalid remoteAddress'),
+      new Error('Invalid ttl')
+    ], 'Invalid arguments'))
   })
 
   test('default values', () => {
@@ -299,6 +361,26 @@ describe('verifyCookie', () => {
     ['127.000.000.001', '127.0.0.1/24', 'fhqwhgads', 127001, 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { remoteAddress: input })).toThrow('Invalid remoteAddress'));
     [0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { key: input })).toThrowError(new TypeError('Invalid key')));
     ['GETTER', 0, false, null].forEach(input => expect(() => signedAccess.verifyCookie(mockURL, signedCookie, { method: input })).toThrowError(new TypeError('Invalid method')))
+
+    expect(() => signedAccess.verifyCookie(undefined, undefined, {
+      algorithm: null,
+      key: null,
+      method: null,
+      remoteAddress: null
+    })).toThrowError(new AggregateError([
+      new TypeError('Invalid URL'),
+      new TypeError('Invalid cookie'),
+      new TypeError('Invalid method'),
+      new Error('Invalid remoteAddress')
+    ], 'Invalid arguments'))
+
+    expect(() => signedAccess.verifyCookie(mockURL, signedAccess.signCookie(prefix, {
+      accessControlAllowMethods: 'GET',
+      remoteAddress: '127.0.0.1'
+    }))).toThrowError(new AggregateError([
+      new Error('method required'),
+      new Error('remoteAddress required')
+    ], 'Invalid cookie'))
   })
 
   test('default values', () => {
