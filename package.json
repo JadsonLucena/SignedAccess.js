@@ -1,6 +1,6 @@
 {
   "name": "@jadsonlucena/signedaccess",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Sign and verify URLs and cookies to add a layer of protection to publicly accessible routes",
   "main": "./src/SignedAccess.js",
   "engines": {
@@ -38,18 +38,27 @@
   },
   "homepage": "https://github.com/JadsonLucena/SignedAccess.js#readme",
   "devDependencies": {
-    "jest": "latest",
+    "@commitlint/cli": "latest",
+    "@commitlint/config-conventional": "latest",
+    "@types/node": "latest",
     "eslint": "latest",
     "eslint-config-standard": "latest",
     "eslint-plugin-jest": "latest",
-    "@commitlint/cli": "latest",
-    "@commitlint/config-conventional": "latest"
+    "jest": "latest"
   },
   "jest": {
     "collectCoverage": true,
     "verbose": true,
-    "collectCoverageFrom": ["./src/*.js"],
-    "coverageReporters": ["clover", "json", "lcov", "text", "html"],
+    "collectCoverageFrom": [
+      "./src/*.js"
+    ],
+    "coverageReporters": [
+      "clover",
+      "json",
+      "lcov",
+      "text",
+      "html"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 100,
@@ -60,13 +69,17 @@
     }
   },
   "eslintConfig": {
-    "plugins": ["jest"],
+    "plugins": [
+      "jest"
+    ],
     "env": {
       "jest/globals": true
     },
     "extends": "standard"
   },
   "commitlint": {
-    "extends": ["@commitlint/config-conventional"]
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
