@@ -22,7 +22,7 @@ The subscription ensures that the permissions for a particular resource are not 
 
 
 ## Interfaces
-Although this is a javascript module, we use a typescript interface to maintain interoperability and better readability. See: [src/SignedAccess.d.ts](https://github.com/JadsonLucena/SignedAccess.js/blob/main/src/SignedAccess.d.ts)
+Although this is a javascript module, we use a typescript interface to maintain interoperability and better readability. See: [src/SignedAccess.d.ts](src/SignedAccess.d.ts)
 
 
 > It is recommended to end all pathnames with / unless you intentionally choose to end the pathname with a partial filename.\
@@ -35,4 +35,4 @@ Although this is a javascript module, we use a typescript interface to maintain 
 > The nonce is signed in the cookie or URL, but it's up to your application to save them and check if they've already been used.
 
 ## Specifications
-We strive to maintain complete code coverage in tests. With that, we provide all the necessary use cases for a good understanding of how this module works. See: [test/SignedAccess.spec.js](https://github.com/JadsonLucena/SignedAccess.js/blob/main/test/SignedAccess.spec.js)
+We strive to maintain complete code coverage in tests. With that, we provide all the necessary use cases for a good understanding of how this module works. See: [test/SignedAccess.spec.js](test/SignedAccess.spec.js)
