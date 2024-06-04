@@ -23,7 +23,7 @@ class SignedAccess {
    * @param {Key} key - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {Object} [options]
    * @param {string} [options.algorithm=sha512] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptogethashes hash algorithms}
-   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds (Natural number)
    *
    * @throws {TypeError} Invalid key
    * @throws {TypeError} Invalid algorithm
@@ -109,7 +109,7 @@ class SignedAccess {
   get key () { return this.#key }
 
   /**
-   * Time to Live in seconds
+   * Time to Live in seconds (Natural number)
    * @type {number}
    * @default 86400
    *
@@ -177,7 +177,7 @@ class SignedAccess {
    * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.pathname] - Starts with / followed by the {@link https://developer.mozilla.org/en-US/docs/Web/API/URL/pathname URL path}, shouldn't include query parameters or fragments such as ? or #
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
-   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds (Natural number)
    *
    * @throws {TypeError} Invalid URL
    * @throws {TypeError} Invalid algorithm
@@ -371,7 +371,7 @@ class SignedAccess {
    * @param {Key} [options.key] - One of the supported {@link https://nodejs.org/api/crypto.html#cryptocreatehmacalgorithm-key-options key types}
    * @param {string} [options.nonce] - Use random {@link https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes Number Once}
    * @param {string} [options.remoteAddress] - {@link https://developer.mozilla.org/en-US/docs/Glossary/IP_Address Client IP}
-   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds
+   * @param {number} [options.ttl=86400] - {@link https://wikipedia.org/wiki/Time_to_live Time to Live} in seconds (Natural number)
    *
    * @throws {TypeError} Invalid prefix
    * @throws {TypeError|SyntaxError} Invalid accessControlAllowMethods
